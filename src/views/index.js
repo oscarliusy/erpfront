@@ -38,10 +38,6 @@ const Instock = Loadable({
     loading: Loading
 })
 
-const IMUpload = Loadable({
-    loader: () => import('./IMUpload'),
-    loading: Loading
-})
 
 //adminRoute views
 const Currency = Loadable({
@@ -74,13 +70,9 @@ const ProductAdd = Loadable({
     loading: Loading
 })
 
-const ProductUploadAdd = Loadable({
-    loader: () => import('./ProductUploadAdd'),
-    loading: Loading
-})
 
-const ProductUploadOutstock = Loadable({
-    loader: () => import('./ProductUploadOutstock'),
+const ProductOutstock = Loadable({
+    loader: () => import('./ProductOutstock'),
     loading: Loading
 })
 
@@ -104,6 +96,40 @@ const ProductDetail = Loadable({
     loading: Loading
 })
 
+const Notifications = Loadable({
+    loader: () => import('./Notifications'),
+    loading: Loading
+})
+
+const Dashboard = Loadable({
+    loader: () => import('./Dashboard'),
+    loading: Loading
+})
+
+const Profile = Loadable({
+    loader: () => import('./Profile'),
+    loading: Loading
+})
+
+const NoAuth = Loadable({
+    loader: () => import('./NoAuth'),
+    loading: Loading
+})
+
+const AdminLogs = Loadable({
+    loader: () => import('./AdminLogs'),
+    loading: Loading
+})
+
+const MaterialUpdateList = Loadable({
+    loader: () => import('./MaterialUpdateList'),
+    loading: Loading
+})
+
+const ProductUpdateList = Loadable({
+    loader: () => import('./ProductUpdateList'),
+    loading: Loading
+})
 export {
     SignIn,
     SignUp,
@@ -115,14 +141,19 @@ export {
     UserList,
     Manage,
     Instock,
-    IMUpload,
     IMLogs,
     ProductList,
     ProductAdd,
-    ProductUploadAdd,
-    ProductUploadOutstock,
+    ProductOutstock,
     PreOutstock,
     PreOutstockList,
     ProductLogs,
-    ProductDetail
+    ProductDetail,
+    Notifications,
+    Dashboard,
+    Profile,
+    NoAuth,
+    AdminLogs,
+    MaterialUpdateList,
+    ProductUpdateList
 }

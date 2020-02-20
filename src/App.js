@@ -4,7 +4,10 @@ import { commonRoutes,adminRoutes} from './routes'
 import { Frame } from '../src/components'
 
 const commonMaterialMenu = commonRoutes.materialMenu.filter(route=>route.isNav === true)
+const commonProductMenu = commonRoutes.productMenu.filter(route=>route.isNav === true)
+const userMenu = commonRoutes.userMenu.filter(route=>route.isNav === true)
 const adminMenu = adminRoutes.filter(route=>route.isNav === true)
+
 
 
 export default class App extends Component {
@@ -12,11 +15,42 @@ export default class App extends Component {
         return (
             <Frame 
                 commonMaterialMenu={commonMaterialMenu}
+                commonProductMenu={commonProductMenu}
                 adminMenu={adminMenu}
+                userMenu={userMenu}
+
             >
                 <Switch>
                     {
                         commonMaterialMenu.map(route=>{
+                            return (
+                                <Route 
+                                    key={route.pathname}
+                                    path={route.pathname}
+                                    exact = {route.exact}
+                                    render={(routerProps)=>{
+                                        return < route.component {...routerProps} />
+                                    }}
+                                />
+                            )
+                        })
+                    }
+                    {
+                        commonProductMenu.map(route=>{
+                            return (
+                                <Route 
+                                    key={route.pathname}
+                                    path={route.pathname}
+                                    exact = {route.exact}
+                                    render={(routerProps)=>{
+                                        return < route.component {...routerProps} />
+                                    }}
+                                />
+                            )
+                        })
+                    }
+                    {
+                        userMenu.map(route=>{
                             return (
                                 <Route 
                                     key={route.pathname}

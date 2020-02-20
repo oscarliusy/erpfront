@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Layout, Menu, Icon } from 'antd'
+import { Layout, Menu, Icon,Dropdown,Avatar,Badge } from 'antd'
 import { withRouter } from 'react-router-dom'
 import logo  from './logo.png'
 import './Frame.less'
@@ -15,7 +15,7 @@ class Frame extends Component {
             openKeys:['sub1']
         }
     }
-    rootSubmenuKeys = ['sub1', 'sub2', 'sub3','sub4','sub5'];
+    rootSubmenuKeys = ['sub1', 'sub2', 'sub3'];
 
     onOpenChange = openKeys => {
         const latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1);
@@ -33,10 +33,39 @@ class Frame extends Component {
       };
 
     onMenuClick=({key})=>{
+        console.log('key',{key})
         this.props.history.push({
             pathname:key
         })
     }
+
+    onDropdownMenuClick=({key})=>{
+        
+        this.props.history.push({pathname:key})
+    }
+
+    renderDropdown=()=> (
+        <Menu onClick={this.onDropdownMenuClick}>
+          <Menu.Item
+            key="/erp/comm/user/notifications"
+          >
+            <Badge dot={true}>
+              通知中心
+            </Badge>
+          </Menu.Item>
+          <Menu.Item
+            key="/erp/comm/user/profile/:id"
+            >
+            个人设置
+          </Menu.Item>
+          <Menu.Item
+            key="/login"
+          >
+            退出登录(bug)
+          </Menu.Item>
+        </Menu>
+      );
+
     render() {
         //console.log(this.props)
         return (
@@ -45,7 +74,15 @@ class Frame extends Component {
                     <div className="spl-logo" >
                         <img src={logo} alt="SPLADMIN"/>
                     </div> 
-                    {/* TODO: Dropdown*/}
+                    <Dropdown overlay={this.renderDropdown()} trigger={['click','hover']}>
+                        <div style={{display:'flex',alignItems:'center'}}> 
+                            <Avatar  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                            <span>欢迎您！oscar</span> 
+                            <Badge count="10" offset={[0,0]}>
+                            <Icon type="down" />
+                            </Badge> 
+                        </div>      
+                    </Dropdown>
                 </Header>
                 <Layout>
                     <Sider 
@@ -63,7 +100,12 @@ class Frame extends Component {
                             style={{ height: '100%', borderRight: 0 }}
                             openKeys={this.state.openKeys}
                             onOpenChange={this.onOpenChange}
+                            onClick = {this.onMenuClick}
                         >
+                        <Menu.Item key="/erp/comm/user/dashboard">
+                            <Icon type="dashboard" />
+                            <span>仪表盘</span>
+                        </Menu.Item>
                         <SubMenu
                             key="sub1"
                             title={<span><Icon type="build" /> 物料 </span>}
@@ -82,45 +124,24 @@ class Frame extends Component {
                         </SubMenu>
                         <SubMenu
                             key="sub2"
-                            title={
-                            <span>
-                                <Icon type="laptop" />
-                                产品
-                            </span>
-                            }
+                            title={<span><Icon type="gift" /> 产品 </span>}
+                            onClick = {this.onMenuClick}
                         >
-                            <Menu.Item key="5">option5</Menu.Item>
-                            <Menu.Item key="6">option6</Menu.Item>
-                            <Menu.Item key="7">option7</Menu.Item>
-                            <Menu.Item key="8">option8</Menu.Item>
+                            {
+                                this.props.commonProductMenu.map(item => {
+                                    return (
+                                        <Menu.Item key={item.pathname}>
+                                            <Icon type={item.icon} />
+                                            <span>{item.title}</span>
+                                        </Menu.Item>
+                                    )
+                                })
+                            }
                         </SubMenu>
+
                         <SubMenu
                             key="sub3"
-                            title={
-                            <span>
-                                <Icon type="notification" />
-                                设置
-                            </span>
-                            }
-                        >
-                            <Menu.Item key="9">option9</Menu.Item>
-                            <Menu.Item key="10">option10</Menu.Item>
-                            <Menu.Item key="11">option11</Menu.Item>
-                            <Menu.Item key="12">option12</Menu.Item>
-                        </SubMenu>
-                        <SubMenu
-                            key="sub4"
-                            title={
-                            <span>
-                                <Icon type="notification" />
-                                仪表盘
-                            </span>
-                            }
-                        >
-                        </SubMenu>
-                        <SubMenu
-                            key="sub5"
-                            title={<span><Icon type="trophy" /> 高级操作 </span>}
+                            title={<span><Icon type="trophy" /> 高级 </span>}
                             onClick = {this.onMenuClick}
                         >
                                 {

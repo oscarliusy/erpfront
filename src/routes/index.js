@@ -9,15 +9,21 @@ import {
     UserList,
     Manage,
     Instock,
-    IMUpload,
     IMLogs,
     ProductList,
     ProductAdd,
-    ProductUploadAdd,
-    ProductUploadOutstock,
+    ProductOutstock,
     PreOutstock,
     PreOutstockList,
-    ProductLogs
+    ProductLogs,
+    Notifications,
+    Dashboard,
+    Profile,
+    NoAuth,
+    AdminLogs,
+    MaterialUpdateList,
+    ProductUpdateList
+    
 } from '../views'
 
 export const mainRoutes = [{
@@ -36,8 +42,8 @@ export const commonRoutes = {
         pathname:'/erp/comm/material/list',
         component:IMList,
         isNav:true,
-        title:'库存清单',
-        icon:'bank'
+        title:'库存',
+        icon:'home'
 
     },{
         pathname:'/erp/comm/material/detail/:id',
@@ -46,7 +52,7 @@ export const commonRoutes = {
         pathname:'/erp/comm/material/add',
         component:MaterialAdd,
         isNav:true,
-        title:'新增物料',
+        title:'新品',
         icon:'bulb'
     },{
         pathname:'/erp/comm/material/instock',
@@ -55,11 +61,11 @@ export const commonRoutes = {
         title:'入库',
         icon:'import'
     },{
-        pathname:'/erp/comm/material/upload',
-        component:IMUpload,
+        pathname:'/erp/comm/material/update',
+        component:MaterialUpdateList,
         isNav:true,
-        title:'批量操作',
-        icon:'shopping-cart'
+        title:'修改',
+        icon:'tool'
     },{
         pathname:'/erp/comm/material/logs',
         component:IMLogs,
@@ -71,42 +77,68 @@ export const commonRoutes = {
        pathname:'/erp/comm/product/list' ,
        component:ProductList,
        isNav:true,
-       title:'清单'
+       title:'清单',
+       icon:'shop'
     },{
         pathname:'/erp/comm/product/add' ,
         component:ProductAdd,
         isNav:true,
-        title:'新增'
+        title:'新品',
+        icon:'bulb'
      },{
-        pathname:'/erp/comm/product/upload/add' ,
-        component:ProductUploadAdd,
+        pathname:'/erp/comm/product/outstock' ,
+        component:ProductOutstock,
         isNav:true,
-        title:'批量新增'
-     },{
-        pathname:'/erp/comm/product/upload/outstock' ,
-        component:ProductUploadOutstock,
-        isNav:true,
-        title:'批量出库'
+        title:'出库',
+        icon:'shopping-cart'
      },{
         pathname:'/erp/comm/product/preoutstock' ,
         component:PreOutstock,
         isNav:true,
-        title:'预出库'
+        title:'预出库',
+        icon:'car'
      },{
         pathname:'/erp/comm/product/preoutstocklist' ,
         component:PreOutstockList,
         isNav:true,
-        title:'预出库记录'
+        title:'预出库记录',
+        icon:'menu'
+     },{
+        pathname:'/erp/comm/product/update' ,
+        component:ProductUpdateList,
+        isNav:true,
+        title:'修改',
+        icon:'tool'
      },{
         pathname:'/erp/comm/product/logs' ,
         component:ProductLogs,
         isNav:true,
-        title:'日志'
+        title:'日志',
+        icon:'container'
      },{
         pathname:'/erp/comm/product/detail/:id',
         component:ProductLogs
      }],
-    userMenu:[]
+    userMenu:[{
+        pathname:'/erp/comm/user/notifications',
+        component:Notifications,
+        isNav:true,
+    },{
+        pathname:'/erp/comm/user/dashboard',
+        component:Dashboard,
+        isNav:true,
+        title:'仪表盘',
+        icon:'dashboard'
+    },{
+        pathname:'/erp/comm/user/profile/:id',
+        component:Profile,
+        isNav:true,
+        title:'个人信息',
+        icon:'user'
+    },{
+        pathname:'/erp/comm/user/noauth',
+        component:NoAuth
+    }]
 }
 
 
@@ -120,15 +152,21 @@ export const adminRoutes = [{
     title:'修改汇率',
     icon:'dollar'
 },{
-    pathname:'/erp/admin/users/list',
+    pathname:'/erp/admin/account/list',
     component:UserList,
     isNav:true,
     title:'账号管理',
     icon:'team'
 },{
-    pathname:'/erp/admin/users/profile/:id',
+    pathname:'/erp/admin/account/:id',
     component:Manage,
     isNav:true,
     title:'账号设置',
     icon:'usergroup-add'
+},{
+    pathname:'/erp/admin/logs',
+    component:AdminLogs,
+    isNav:true,
+    title:'日志',
+    icon:'container'
 }]

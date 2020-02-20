@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 
-export default class ProductUploadOutstock extends Component {
+export default class Profile extends Component {
     render() {
         return (
             <div>
-                批量出库
+                个人设置
             </div>
         )
     }
