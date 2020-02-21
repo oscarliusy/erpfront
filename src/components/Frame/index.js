@@ -29,11 +29,13 @@ class Frame extends Component {
       }
 
     onCollapse = collapsed => {
-        this.setState({ collapsed });
+        this.setState({ 
+            collapsed,
+            openKeys:[]
+         });
       };
 
     onMenuClick=({key})=>{
-        console.log('key',{key})
         this.props.history.push({
             pathname:key
         })

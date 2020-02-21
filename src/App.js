@@ -3,9 +3,9 @@ import { Route,Switch,Redirect } from 'react-router-dom'
 import { commonRoutes,adminRoutes} from './routes'
 import { Frame } from '../src/components'
 
-const commonMaterialMenu = commonRoutes.materialMenu.filter(route=>route.isNav === true)
-const commonProductMenu = commonRoutes.productMenu.filter(route=>route.isNav === true)
-const userMenu = commonRoutes.userMenu.filter(route=>route.isNav === true)
+const commonMaterialMenu = commonRoutes.materialRoutes.filter(route=>route.isNav === true)
+const commonProductMenu = commonRoutes.productRoutes.filter(route=>route.isNav === true)
+const userMenu = commonRoutes.userRoutes.filter(route=>route.isNav === true)
 const adminMenu = adminRoutes.filter(route=>route.isNav === true)
 
 
@@ -22,7 +22,7 @@ export default class App extends Component {
             >
                 <Switch>
                     {
-                        commonMaterialMenu.map(route=>{
+                        commonRoutes.materialRoutes.map(route=>{
                             return (
                                 <Route 
                                     key={route.pathname}
@@ -36,7 +36,7 @@ export default class App extends Component {
                         })
                     }
                     {
-                        commonProductMenu.map(route=>{
+                        commonRoutes.productRoutes.map(route=>{
                             return (
                                 <Route 
                                     key={route.pathname}
@@ -50,7 +50,7 @@ export default class App extends Component {
                         })
                     }
                     {
-                        userMenu.map(route=>{
+                        commonRoutes.userRoutes.map(route=>{
                             return (
                                 <Route 
                                     key={route.pathname}
@@ -64,7 +64,7 @@ export default class App extends Component {
                         })
                     }
                     {
-                        adminMenu.map(route=>{
+                        adminRoutes.map(route=>{
                             return (
                                 <Route 
                                     key={route.pathname}
@@ -78,7 +78,7 @@ export default class App extends Component {
                         })
                     }
                     <Redirect to={commonMaterialMenu[0].pathname} from='/erp' exact/>
-                    <Redirect to='/404' />
+                    <Redirect to='/404/' />
                 </Switch>
             </Frame>
         )

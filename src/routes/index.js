@@ -3,7 +3,6 @@ import {
     SignUp,
     NotFound,
     IMList,
-    IMDetail,
     MaterialAdd,
     Currency,
     UserList,
@@ -22,7 +21,8 @@ import {
     NoAuth,
     AdminLogs,
     MaterialUpdateList,
-    ProductUpdateList
+    ProductUpdateList,
+    MaterialEdit
     
 } from '../views'
 
@@ -38,16 +38,16 @@ export const mainRoutes = [{
 }]
 
 export const commonRoutes = {
-    materialMenu:[{
+    materialRoutes:[{
         pathname:'/erp/comm/material/list',
+        exact:true,
         component:IMList,
         isNav:true,
         title:'库存',
         icon:'home'
-
     },{
-        pathname:'/erp/comm/material/detail/:id',
-        component:IMDetail
+        pathname:'/erp/comm/material/edit/:id',
+        component:MaterialEdit
     },{
         pathname:'/erp/comm/material/add',
         component:MaterialAdd,
@@ -73,7 +73,7 @@ export const commonRoutes = {
         title:'日志',
         icon:'container'
     }],
-    productMenu:[{
+    productRoutes:[{
        pathname:'/erp/comm/product/list' ,
        component:ProductList,
        isNav:true,
@@ -119,7 +119,7 @@ export const commonRoutes = {
         pathname:'/erp/comm/product/detail/:id',
         component:ProductLogs
      }],
-    userMenu:[{
+    userRoutes:[{
         pathname:'/erp/comm/user/notifications',
         component:Notifications,
         isNav:true,

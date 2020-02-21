@@ -20,9 +20,27 @@ service.interceptors.response.use((resp)=>{
     }else{
         //全局处理错误
         message.error(resp.data.errMsg)
+        console.log('network err:',resp)
     }
 })
 
 export const getDashboardStatistic = () =>{
     return service.post('/api/v1/dashboard')
+}
+
+export const getInventoryMaterialList = (offset = 0, limited = 10,keyword,sort) =>{
+    return service.post('/api/v1/material/list',{
+        offset,
+        limited,
+        keyword,
+        sort
+    })
+}
+
+export const postMaterialEdit = (params)=>{
+    return service.post('/api/v1/material/edit',params)
+}
+
+export const getMaterialDetailById = (id) =>{
+    return service.post(`/api/v1/material/detail/${id}`)
 }

@@ -130,6 +130,11 @@ const ProductUpdateList = Loadable({
     loader: () => import('./ProductUpdateList'),
     loading: Loading
 })
+
+const MaterialEdit = Loadable({
+    loader: () => import('./IMList/Edit'),
+    loading: Loading
+})
 export {
     SignIn,
     SignUp,
@@ -155,5 +160,6 @@ export {
     NoAuth,
     AdminLogs,
     MaterialUpdateList,
-    ProductUpdateList
+    ProductUpdateList,
+    MaterialEdit
 }
