@@ -44,3 +44,8 @@ export const postMaterialEdit = (params)=>{
 export const getMaterialDetailById = (id) =>{
     return service.post(`/api/v1/material/detail/${id}`)
 }
+
+export const postMaterialAdd = (params) =>{
+    //console.log({params})
+    return service.post('/api/v1/material/add',params)
+}

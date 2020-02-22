@@ -1,3 +1,9 @@
+/*
+*TODO: 导出excel还没写，没确定是导出当前页还是所有数据。
+*/
+
+
+
 import React, { Component } from 'react'
 import { 
     Card,
@@ -140,7 +146,11 @@ export default class IMList extends Component {
             this.getData()
         })
     }
-    
+
+    toExcel = () =>{
+        console.log("还没有开发")
+    }
+
     componentDidMount(){
         this.getData()
     }
@@ -152,7 +162,7 @@ export default class IMList extends Component {
                     title={<span>当前库存：{this.state.totalInventory}</span>}
                     bordered={false}
                     extra={
-                        <Button>导出当前页excel</Button>
+                        <Button onClick={this.toExcel}>导出当前页excel</Button>
                     }
                 >
                     <div style={{width:"600px",padding:"10px"}}>
