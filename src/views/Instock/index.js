@@ -5,12 +5,12 @@ import {
     Card,
     Form,
     Input,
-    Spin,
-    message,
+    Popconfirm,
     Select,
-    Icon,
+
     DatePicker
  } from 'antd'
+import { EditableTable } from '../../components'
 
 const { Option } = Select
 const instockerList = ['FAN','LICH','BO','OSCAR']
@@ -29,9 +29,10 @@ class Instock extends Component {
     constructor(){
         super()
         this.state={ 
-            visible: false 
+            visible: false,
         }
     }
+
 
     showDrawer = () => {
       this.setState({
@@ -58,6 +59,9 @@ class Instock extends Component {
         // this.setState({
         //     purchaser:value
         // })
+    }
+    componentDidMount(){
+        
     }
     render() {
       const { getFieldDecorator } = this.props.form
@@ -139,6 +143,11 @@ class Instock extends Component {
                             }
                         </Select>
                     )} 
+                </Form.Item>
+                <Form.Item
+                    label="添加入库项"
+                >
+                    <EditableTable />
                 </Form.Item>
                 </Form> 
             </Card>

@@ -1,14 +1,17 @@
 import React, { Component } from 'react'
 import { Table, Input, Button, Popconfirm, Form } from 'antd'
 
-const EditableContext = React.createContext();//?
+const EditableContext = React.createContext();//用来跨组件传参的Context对象
+
+//函数式组件，用来返回一个table-row，这个tr里携带了form参数
 const EditableRow = ({ form, index, ...props }) => (
     <EditableContext.Provider value={form}>
       <tr {...props} />
     </EditableContext.Provider>
 )
-const EditableFormRow = Form.create()(EditableRow)
 
+//
+const EditableFormRow = Form.create()(EditableRow)
 
 class EditableCell extends React.Component {
     state = {
@@ -162,6 +165,9 @@ export default class MaterialUpdateList extends Component {
         });
         this.setState({ dataSource: newData });
       };
+    componentDidUpdate(){
+      console.log(this.state.dataSource)
+    }
     render() {
         const { dataSource } = this.state;
         const components = {
