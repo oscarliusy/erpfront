@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import { Table, Input, Button, Popconfirm, Form } from 'antd'
+import { Table, Input, Button, Popconfirm, Form,Icon } from 'antd'
+import { connect } from 'react-redux'
+import { addEmptyRowToInstockTable,deleteInstockRow,saveInstockRowModify } from '../../actions/instockTable'
 
 const EditableContext = React.createContext();//用来跨组件传参的Context对象
 
@@ -88,7 +90,20 @@ class EditableCell extends React.Component {
     }
 }
 
-export default class EditableTable extends Component {
+const mapState = state =>{
+    const {
+        dataSource,
+        count
+    } = state.instockTable
+
+    return {
+        dataSource,
+        count
+    }
+}
+
+@connect(mapState,{addEmptyRowToInstockTable,deleteInstockRow,saveInstockRowModify})
+class EditableTable extends Component {
     constructor(props){
         super(props)
         this.columns = [
@@ -114,67 +129,59 @@ export default class EditableTable extends Component {
                 title:'操作',
                 dataIndex:'operation',
                 render:(text,record) =>
-                    this.state.dataSource.length >=1 ? (
-                        <Popconfirm title="确认删除该行？" onConfirm={()=> this.handleDelete(record.key)}>
-                            <a>删除</a>
-                        </Popconfirm>
+                    this.props.dataSource.length >=1 ? (
+                        <>
+                            <Popconfirm title="确认删除该行？" onConfirm={()=> this.handleDelete(record.key)}>
+                                <span style={{color:"blue"}}>删除</span>
+                            </Popconfirm>
+                            <Button style={{ marginLeft:"20px"}} onClick={()=>this.handleSearch(record.key)}>
+                                <Icon type="search" />
+                            </Button>
+                        </>
                     ) : null 
             }
         ]
-
-        this.state = {
-            dataSource:[
-                {
-                    key:'0',
-                    uniqueId:'Swimming Paddle',
-                    amount:'5',
-                    desc:'游泳玩具'
-                },
-                {
-                    key:'1',
-                    uniqueId:'',
-                    amount:'',
-                    desc:''
-                }
-            ],
-            count:2
-        }
     }
+
+    handleSearch = key =>{
+        //console.log('search:',key)
+        this.props.setSelectedSearchRowKey(key)
+        this.props.showDrawer()
+    }
+
     handleDelete = key => {
-        const dataSource = [...this.state.dataSource]
-        this.setState({
-            dataSource:dataSource.filter(item=>item.key !== key)//仅返回序号不为key的行
-        })
+        const dataSource = [...this.props.dataSource].filter(item=>item.key !== key)
+        this.props.deleteInstockRow(dataSource)
     }
 
     handleAdd = () => {
-        const { count,dataSource } = this.state
+        const { count,dataSource } = this.props
         const newData = {
             key: count,
-            uniqueId:'',
-            amount:'',
-            desc:''
+            uniqueId:'uniqueId',
+            amount:'amount',
+            desc:'description'
         }
-        this.setState({
+        this.props.addEmptyRowToInstockTable({
             dataSource:[...dataSource,newData],
             count:count+1
         })
     }
 
     handleSave = row => {
-        const newData = [...this.State.dataSource]
+        const newData = [...this.props.dataSource]
         const index = newData.findIndex(item => row.key === item.key)//返回数组中满足条件的第一个元素的索引。否则返回-1
         const item = newData[index]
         newData.splice(index,1,{
             ...item,
             ...row,
         })
-        this.setState({dataSource:newData})
+        this.props.saveInstockRowModify(newData)
     }
 
     render(){
         console.log('props:',this.props)
-        const { dataSource } = this.state
+        const { dataSource } = this.props
         const components = {
             body: {
                 row: EditableFormRow,
@@ -182,7 +189,7 @@ export default class EditableTable extends Component {
             }
         }
         const columns = this.columns.map(col => {
-        if(!col.editable){
+            if(!col.editable){
                 return col
             }
             return {
@@ -213,3 +220,5 @@ export default class EditableTable extends Component {
     }
     
 }
+
+export default EditableTable

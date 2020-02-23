@@ -1,209 +1,151 @@
+import { Drawer, Form, Button, Col, Row, Input, Select, DatePicker, Icon } from 'antd';
 import React, { Component } from 'react'
-import { Table, Input, Button, Popconfirm, Form } from 'antd'
+const { Option } = Select;
+ 
+@Form.create()
+class MaterialUpdateList extends Component {
+  state = { visible: false };
 
-const EditableContext = React.createContext();//用来跨组件传参的Context对象
+  showDrawer = () => {
+    this.setState({
+      visible: true,
+    });
+  };
 
-//函数式组件，用来返回一个table-row，这个tr里携带了form参数
-const EditableRow = ({ form, index, ...props }) => (
-    <EditableContext.Provider value={form}>
-      <tr {...props} />
-    </EditableContext.Provider>
-)
+  onClose = () => {
+    this.setState({
+      visible: false,
+    });
+  };
 
-//
-const EditableFormRow = Form.create()(EditableRow)
-
-class EditableCell extends React.Component {
-    state = {
-      editing: false,
-    };
-  
-    toggleEdit = () => {
-      const editing = !this.state.editing;
-      this.setState({ editing }, () => {
-        if (editing) {
-          this.input.focus();
-        }
-      });
-    };
-  
-    save = e => {
-      const { record, handleSave } = this.props;
-      this.form.validateFields((error, values) => {
-        if (error && error[e.currentTarget.id]) {
-          return;
-        }
-        this.toggleEdit();
-        handleSave({ ...record, ...values });
-      });
-    };
-  
-    renderCell = form => {
-      this.form = form;
-      const { children, dataIndex, record, title } = this.props;
-      const { editing } = this.state;
-      return editing ? (
-        <Form.Item style={{ margin: 0 }}>
-          {form.getFieldDecorator(dataIndex, {
-            rules: [
-              {
-                required: true,
-                message: `${title} is required.`,
-              },
-            ],
-            initialValue: record[dataIndex],
-          })(<Input ref={node => (this.input = node)} onPressEnter={this.save} onBlur={this.save} />)}
-        </Form.Item>
-      ) : (
-        <div
-          className="editable-cell-value-wrap"
-          style={{ paddingRight: 24 }}
-          onClick={this.toggleEdit}
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <div>
+        <Button type="primary" onClick={this.showDrawer}>
+          <Icon type="plus" /> New account
+        </Button>
+        <Drawer
+          title="Create a new account"
+          width={720}
+          onClose={this.onClose}
+          visible={this.state.visible}
+          bodyStyle={{ paddingBottom: 80 }}
         >
-          {children}
-        </div>
-      );
-    };
-  
-    render() {
-      const {
-        editable,
-        dataIndex,
-        title,
-        record,
-        index,
-        handleSave,
-        children,
-        ...restProps
-      } = this.props;
-      return (
-        <td {...restProps}>
-          {editable ? (
-            <EditableContext.Consumer>{this.renderCell}</EditableContext.Consumer>
-          ) : (
-            children
-          )}
-        </td>
-      );
-    }
+          <Form layout="vertical" hideRequiredMark>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Name">
+                  {getFieldDecorator('name', {
+                    rules: [{ required: true, message: 'Please enter user name' }],
+                  })(<Input placeholder="Please enter user name" />)}
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Url">
+                  {getFieldDecorator('url', {
+                    rules: [{ required: true, message: 'Please enter url' }],
+                  })(
+                    <Input
+                      style={{ width: '100%' }}
+                      addonBefore="http://"
+                      addonAfter=".com"
+                      placeholder="Please enter url"
+                    />,
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Owner">
+                  {getFieldDecorator('owner', {
+                    rules: [{ required: true, message: 'Please select an owner' }],
+                  })(
+                    <Select placeholder="Please select an owner">
+                      <Option value="xiao">Xiaoxiao Fu</Option>
+                      <Option value="mao">Maomao Zhou</Option>
+                    </Select>,
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Type">
+                  {getFieldDecorator('type', {
+                    rules: [{ required: true, message: 'Please choose the type' }],
+                  })(
+                    <Select placeholder="Please choose the type">
+                      <Option value="private">Private</Option>
+                      <Option value="public">Public</Option>
+                    </Select>,
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Approver">
+                  {getFieldDecorator('approver', {
+                    rules: [{ required: true, message: 'Please choose the approver' }],
+                  })(
+                    <Select placeholder="Please choose the approver">
+                      <Option value="jack">Jack Ma</Option>
+                      <Option value="tom">Tom Liu</Option>
+                    </Select>,
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="DateTime">
+                  {getFieldDecorator('dateTime', {
+                    rules: [{ required: true, message: 'Please choose the dateTime' }],
+                  })(
+                    <DatePicker.RangePicker
+                      style={{ width: '100%' }}
+                      getPopupContainer={trigger => trigger.parentNode}
+                    />,
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item label="Description">
+                  {getFieldDecorator('description', {
+                    rules: [
+                      {
+                        required: true,
+                        message: 'please enter url description',
+                      },
+                    ],
+                  })(<Input.TextArea rows={4} placeholder="please enter url description" />)}
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              borderTop: '1px solid #e9e9e9',
+              padding: '10px 16px',
+              background: '#fff',
+              textAlign: 'right',
+            }}
+          >
+            <Button onClick={this.onClose} style={{ marginRight: 8 }}>
+              Cancel
+            </Button>
+            <Button onClick={this.onClose} type="primary">
+              Submit
+            </Button>
+          </div>
+        </Drawer>
+      </div>
+    );
+  }
 }
 
-export default class MaterialUpdateList extends Component {
-    constructor(props) {
-        super(props);
-        this.columns = [
-          {
-            title: 'name',
-            dataIndex: 'name',
-            width: '30%',
-            editable: true,
-          },
-          {
-            title: 'age',
-            dataIndex: 'age',
-          },
-          {
-            title: 'address',
-            dataIndex: 'address',
-          },
-          {
-            title: 'operation',
-            dataIndex: 'operation',
-            render: (text, record) =>
-              this.state.dataSource.length >= 1 ? (
-                <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
-                  <a>Delete</a>
-                </Popconfirm>
-              ) : null,
-          },
-        ];
-    
-        this.state = {
-          dataSource: [
-            {
-              key: '0',
-              name: 'Edward King 0',
-              age: '32',
-              address: 'London, Park Lane no. 0',
-            },
-            {
-              key: '1',
-              name: 'Edward King 1',
-              age: '32',
-              address: 'London, Park Lane no. 1',
-            },
-          ],
-          count: 2,
-        };
-      }
-      handleDelete = key => {
-        const dataSource = [...this.state.dataSource];
-        this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
-      };
-    
-      handleAdd = () => {
-        const { count, dataSource } = this.state;
-        const newData = {
-          key: count,
-          name: `Edward King ${count}`,
-          age: 32,
-          address: `London, Park Lane no. ${count}`,
-        };
-        this.setState({
-          dataSource: [...dataSource, newData],
-          count: count + 1,
-        });
-      };
-    
-      handleSave = row => {
-        const newData = [...this.state.dataSource];
-        const index = newData.findIndex(item => row.key === item.key);
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        this.setState({ dataSource: newData });
-      };
-    componentDidUpdate(){
-      console.log(this.state.dataSource)
-    }
-    render() {
-        const { dataSource } = this.state;
-        const components = {
-          body: {
-            row: EditableFormRow,
-            cell: EditableCell,
-          },
-        };
-        const columns = this.columns.map(col => {
-          if (!col.editable) {
-            return col;
-          }
-          return {
-            ...col,
-            onCell: record => ({
-              record,
-              editable: col.editable,
-              dataIndex: col.dataIndex,
-              title: col.title,
-              handleSave: this.handleSave,
-            }),
-          };
-        });
-        return (
-          <div>
-            <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
-              Add a row
-            </Button>
-            <Table
-              components={components}
-              rowClassName={() => 'editable-row'}
-              bordered
-              dataSource={dataSource}
-              columns={columns}
-            />
-          </div>
-        );
-    }
-}
+export default MaterialUpdateList
