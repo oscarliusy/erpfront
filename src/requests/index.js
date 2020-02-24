@@ -49,3 +49,20 @@ export const postMaterialAdd = (params) =>{
     //console.log({params})
     return service.post('/api/v1/material/add',params)
 }
+
+//params={keyword,offset,limited}
+export const instockMaterialSearch = (params) =>{
+    return service.post('/api/v1/material/search',params)
+}
+
+//params={code,desc,createAt,user,data={dataSource,count}}
+export const instockMaterialPost = (params) =>{
+    return service.post('/api/v1/material/instock',params)
+}
+
+export const getMaterialEditLogs = (offset = 0, limited = 10) =>{
+    return service.post('/api/v1/material/editlog',{
+        offset,
+        limited
+    })
+}

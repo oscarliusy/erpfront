@@ -63,7 +63,6 @@ export const commonRoutes = {
     },{
         pathname:'/erp/comm/material/update',
         component:MaterialUpdateList,
-        isNav:true,
         title:'修改',
         icon:'tool'
     },{

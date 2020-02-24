@@ -7,12 +7,16 @@ import {
     Input,
     Select,
     Table,
-    DatePicker
+    DatePicker,
+    message,
+    Spin
  } from 'antd'
  
 import { EditableTable } from '../../components'
 import { connect } from 'react-redux'
 import { saveInstockRowModify } from '../../actions/instockTable'
+import { instockMaterialSearch,instockMaterialPost } from '../../requests'
+import moment from 'moment'
 
 
 const { Search } = Input
@@ -24,51 +28,15 @@ const formLayout = {
         span:4
     },
     wrapperCol:{
-        span:16
+        span:20
     }
 }
 
-const columnsD = [
-    {
-      title: '唯一识别码',
-      dataIndex: 'uniqueId',
-      render: text => <span>{text}</span>,
-    },
-    {
-      title: '库存数量',
-      dataIndex: 'amount',
-    },
-    {
-      title: '详细信息',
-      dataIndex: 'desc',
-    },
-  ];
-  const dataD = [
-    {
-      key: '1',
-      uniqueId: 'Snow walker',
-      amount: 32,
-      desc: '雪地爬犁',
-    },
-    {
-      key: '2',
-      uniqueId: 'Bycicle Shadow',
-      amount: 12,
-      desc: '自行车挡板',
-    },
-    {
-      key: '3',
-      uniqueId: 'Fishing dish',
-      amount: 0,
-      desc: '钓鱼玩具',
-    },
-    {
-      key: '4',
-      uniqueId: 'Gun bag',
-      amount: 22,
-      desc: '枪袋',
-    },
-  ];
+const titleDisplayMap = {
+    uniqueId:'唯一识别码',
+    amount: '库存数量',
+    desc:'详细信息'
+}
 
 const mapState = state =>{
     const {
@@ -90,10 +58,19 @@ class Instock extends Component {
         this.state={ 
             visible: false,
             selectedRowData:[],
-            selectedSearchRowKey:0
+            selectedSearchRowKey:0,
+            offset:0,
+            limited:5,
+            total:0,
+            searchKeyWord:'',
+            drawerSubmitDisabled:true,
+            columns:[],
+            dataSource:[],
+            instockSubmitDisabled:false,
+            isSearchSpin:false,
+            isSubmitSpin:false
         }
     }
-
 
     showDrawer = () => {
       this.setState({
@@ -107,36 +84,83 @@ class Instock extends Component {
       });
     };
 
-    handleSubmit = e => {
+    formDataValidator = (values) =>{
+        let instockErr=''
+        let params = {}
+        let _dataSource =  [...this.props.dataSource]
+        let _count = this.props.count
+        if(_dataSource.length <= 0) {
+            instockErr = '无入库项'
+            return {params,instockErr}
+        }
+        _dataSource.map(item=>{
+            if(item.instockAmount === 0 || !Boolean(Number(item.instockAmount)) || item.uniqueId === 'uniqueId'){
+                instockErr='入库项填写有误，请检查'  
+            }
+            return item
+        })
+        if(instockErr) return {params,instockErr}
+
+        params={
+            code:values.instockCode,
+            desc:values.instockDesc,
+            createAt:moment(values.instockAt),
+            user:values.instocker,
+            data:{
+                dataSource:_dataSource,
+                count:_count
+            }
+        }
+        return {params,instockErr}
+    }
+
+    handleSubmit = e => {  
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
           if (!err) {
-            console.log('Received values of form: ', values)
+            const {params,instockErr} = this.formDataValidator(values)
+            if(instockErr){
+                message.error(instockErr)
+            }else{
+                this.setState({isSubmitSpin:true})
+                console.log('submit parms:',params)
+                instockMaterialPost(params)          
+                .then(resp=>{
+                    message.success(resp.msg)
+                })
+                .catch(err=>{
+                    console.log(err)
+                })
+                .finally(()=>{
+                    this.setState({isSubmitSpin:false})
+                })
+            }
+          }else{
+            message.error('请检查必填项和入库项是否填写正确')
           }
         })
     }
+
+    //已被Form自动管理，无需再设置
     handleSelectPurchaserChange = (value) =>{
         console.log(`selected ${value}`)
-        // this.setState({
-        //     purchaser:value
-        // })
     }
 
-    onDrawerSearch = ( value ) => {
-        console.log('drawer Search:',value)
-    }
+
 
     rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
-          //console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-          this.setState({
-              selectedRowData:[...selectedRows]
-          })
-        },
-        getCheckboxProps: record => ({
-          disabled: record.name === 'Disabled User', // Column configuration not to be checked
-          name: record.name,
-        }),
+          if(selectedRows.length !== 1){
+              this.setState({
+                  drawerSubmitDisabled:true
+              })
+          }else{
+            this.setState({
+                selectedRowData:[...selectedRows],
+                drawerSubmitDisabled:false
+            })
+          }
+        }
     }
 
     setSelectedSearchRowKey = (key) =>{
@@ -160,6 +184,70 @@ class Instock extends Component {
         })
         this.props.saveInstockRowModify(_dataSource)
     }
+
+    setDrawerSubmitDisable = () =>{
+        this.setState({
+            drawerSubmitDisabled:true
+        })
+    }
+
+    onPageChange=(page, pageSize)=>{
+        this.setState({
+          offset:pageSize*(page - 1),
+          limited:pageSize
+        },()=>{
+          this.getSearchData()
+        })
+    }
+
+    onDrawerSearch = ( value ) => {
+        this.setState({
+            searchKeyWord:value
+        },()=>{
+            this.getSearchData()
+        })
+    }
+
+
+    createColumns = (columnsKeys) =>{
+        const columns = columnsKeys.map(item=>{
+            return {
+                title:titleDisplayMap[item],
+                dataIndex:item,
+                key:item
+            }
+        })
+        return columns
+    }
+
+    getSearchData = () =>{
+        this.setState({ isSearchSpin: true})
+        const params = {
+            keyword:this.state.searchKeyWord,
+            offset:this.state.offset,
+            limited:this.state.limited
+        }
+        instockMaterialSearch(params)
+        .then(resp=>{
+            const columnsKeys = Object.keys(resp.list[0])
+            columnsKeys.splice(0,1)//不在table中显示id
+            const colunms = this.createColumns(columnsKeys)
+            if(!this.updater.isMounted(this)) return
+            this.setState({
+                columns:colunms,
+                dataSource:resp.list,
+                total:resp.total
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+        .finally(()=>{
+            this.setState({ isSearchSpin: false})
+        })
+    }
+
+
     componentDidMount(){
         
     }
@@ -175,6 +263,7 @@ class Instock extends Component {
                 bordered={false}
                 extra={<Button onClick={this.props.history.goBack}>取消</Button>} 
             >
+            <Spin spinning={this.state.isSubmitSpin}>
                <Form
                     onSubmit={this.handleSubmit}
                     {...formLayout}
@@ -235,7 +324,6 @@ class Instock extends Component {
                         })(
                             <Select 
                             style={{ width: 200 }} 
-                            onChange={this.handleSelectPurchaserChange}
                         >
                             {
                                 instockerList.map(item=>{
@@ -253,28 +341,33 @@ class Instock extends Component {
                     <EditableTable 
                         showDrawer={this.showDrawer} 
                         setSelectedSearchRowKey={this.setSelectedSearchRowKey}
+                        setDrawerSubmitDisable = {this.setDrawerSubmitDisable}
                     />
                 </Form.Item>
+                <Form.Item wrapperCol={{ offset:4 }}>
+                        <Button type="primary" htmlType="submit" disabled={this.state.instockSubmitDisabled}>
+                           提交
+                        </Button>
+                </Form.Item>
                 </Form> 
+                </Spin>
             </Card>
             <div>
-            <Button type="primary" onClick={this.showDrawer}>
-                Open
-            </Button>
             <Drawer
                 title="选择出库项"
                 placement="right"
                 onClose={this.onClose}
                 visible={this.state.visible}
-                width={800}
+                width={1200}
                 closable={true}
                 destroyOnClose={true}
             >
-                <div style={{width:"400px",padding:"10px"}}>
+                <Spin spinning={this.state.isSearchSpin}>
+                <div style={{width:"850px",padding:"10px"}}>
                     <Card
                      bordered={false}
                     > 
-                        <div style={{width:"600px",padding:"10px"}}>
+                        <div style={{width:"800px",padding:"10px"}}>
                             <Search
                                 placeholder="输入唯一识别码或详细信息进行搜索"
                                 enterButton="Search"
@@ -282,11 +375,17 @@ class Instock extends Component {
                                 onSearch={value=>{this.onDrawerSearch(value)}}                        
                             />
                         </div>
-                        <div  style={{width:"600px",padding:"10px"}}>
+                        <div  style={{width:"800px",padding:"10px",marginBottom:"20px"}}>
                             <Table 
+                                rowKey={record=>record.id}
                                 rowSelection={this.rowSelection} 
-                                columns={columnsD} 
-                                dataSource={dataD} 
+                                columns={this.state.columns} 
+                                dataSource={this.state.dataSource} 
+                                pagination={{
+                                    total:this.state.total,
+                                    onChange : this.onPageChange,
+                                    pageSize:5
+                                }}
                             />
                         </div>
                         <div
@@ -304,16 +403,21 @@ class Instock extends Component {
                             <Button onClick={this.onClose} style={{ marginRight: 8 }}>
                                 Cancel
                             </Button>
-                            <Button onClick={this.handleDrawerSubmit} type="primary">
+                            <Button 
+                                onClick={this.handleDrawerSubmit} 
+                                type="primary" 
+                                disabled={this.state.drawerSubmitDisabled}
+                            >
                                 Submit
                             </Button>
                         </div>
                     </Card>
                 </div>
+                </Spin>
             </Drawer>
-            </div>`
+            </div>
         </>
-      );
+      )
     }
 }
 

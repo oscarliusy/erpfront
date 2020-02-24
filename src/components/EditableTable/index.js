@@ -112,14 +112,17 @@ class EditableTable extends Component {
                 dataIndex:'key'
             },
             {
-                title:'唯一识别码',
-                dataIndex:'uniqueId',
-                editable:true,
+                title:'入库数',
+                dataIndex:'instockAmount',
+                editable:true
             },
             {
-                title:'数量',
+                title:'唯一识别码',
+                dataIndex:'uniqueId',
+            },
+            {
+                title:'库存',
                 dataIndex:'amount',
-                editable:true
             },
             {
                 title:'详细信息',
@@ -147,6 +150,7 @@ class EditableTable extends Component {
         //console.log('search:',key)
         this.props.setSelectedSearchRowKey(key)
         this.props.showDrawer()
+        this.props.setDrawerSubmitDisable()
     }
 
     handleDelete = key => {
@@ -158,6 +162,7 @@ class EditableTable extends Component {
         const { count,dataSource } = this.props
         const newData = {
             key: count,
+            instockAmount:0,
             uniqueId:'uniqueId',
             amount:'amount',
             desc:'description'
@@ -180,7 +185,7 @@ class EditableTable extends Component {
     }
 
     render(){
-        console.log('props:',this.props)
+        //console.log('props:',this.props)
         const { dataSource } = this.props
         const components = {
             body: {
