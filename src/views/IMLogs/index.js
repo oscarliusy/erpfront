@@ -1,18 +1,25 @@
 import React, { Component } from 'react'
 import { 
     Tabs,
-    Table
+    Table,
+    Button,
+  
+    Drawer,
+    Card
  } from 'antd'
 import './imlogs.less'
 import moment from 'moment'
-import {getMaterialEditLogs} from '../../requests'
+import {getMaterialEditLogs,getMaterialInstockLogs,getInstockDetailById} from '../../requests'
 
 const { TabPane } = Tabs
 const titleDisplayMap = {
     id:'编号',
     uniqueId:'唯一识别码',
-    creatAt:'时间',
+    createAt:'时间',
     user:'用户',
+    desc:'备注',
+    amount:'入库数量',
+    inventory:'入库前库存'
 }
 
 export default class IMLogs extends Component {
@@ -37,9 +44,18 @@ export default class IMLogs extends Component {
             limitedTab3:10,
             totalTab3:0,
 
-            currentTab:""
+            currentTab:"",
+
+            visible:false,
+            idDrawer:0,
+            columnsDrawer:[],
+            dataSourceDrawer:[],
+            offsetDrawer:0,
+            limitedDrawer:10,
+            totalDrawer:0
         }
     }
+
     callback= (key) =>{
         this.setState({
             currentTab:key
@@ -49,7 +65,46 @@ export default class IMLogs extends Component {
     }
 
 
-    createColumns = (columnsKeys) =>{
+    toInstockDetail = (record) =>{
+        this.setState({
+            idDrawer:record.id
+        })
+        this.showDrawer()
+    }
+    showDrawer = () => {
+        this.setState({
+          visible: true,
+          currentTab:'drawer'
+        },()=>{
+            this.getData()
+        })
+
+    }
+
+    onClose = () => {
+        this.setState({
+          visible: false,
+        });
+    }
+
+    renderDrawer = () => {
+        getInstockDetailById(
+            this.state.idDrawer,
+            this.state.offsetDrawer,
+            this.state.limitedDrawer
+        )
+        .then(resp=>{
+            const {columns,dataSource} = this.buildColumnsDataSource(resp)
+            if(!this.updater.isMounted(this)) return
+            this.setState({
+                columnsDrawer:columns,
+                dataSourceDrawer:dataSource,
+                totalDrawer:resp.total
+            })
+        })
+    }
+
+    createColumns = (columnsKeys,tabName) =>{
         const columns = columnsKeys.map(item=>{
             return {
                 title:titleDisplayMap[item],
@@ -57,23 +112,52 @@ export default class IMLogs extends Component {
                 key:item
             }
         })
+        if(tabName === "tab1"){
+            columns.push({
+                title:'操作',
+                key:'action',
+                render:(text,record)=>{
+                  return (
+                    <Button size="small" type="primary" onClick={this.toInstockDetail.bind(this,record)}>查看详情</Button>
+                  )
+                }
+            })
+        }
         return columns
     }
 
+    buildColumnsDataSource = (resp)=>{
+        const columnsKeys = Object.keys(resp.list[0])
+        const columns = this.createColumns(columnsKeys,this.state.currentTab)
+        const dataSource = resp.list.map(item=>{
+            if(item.createAt) item.createAt = moment(item.createAt).format('YYYY-MM-DD HH:mm:ss')
+            return item
+        })
+        return {columns,dataSource}
+    }
+
     renderTab1=()=>{
-        getMaterialEditLogs(this.state.offsetTab1,this.state.limitedTab1)
+        getMaterialInstockLogs(this.state.offsetTab1,this.state.limitedTab1)
         .then(resp=>{
-            const columnsKeys = Object.keys(resp.list[0])
-            const columns = this.createColumns(columnsKeys)
-            const _dataSource = resp.list.map(item=>{
-                item.createAt = moment(item.createAt).format('YYYY-MM-DD HH:mm:ss')
-                return item
-            })
+            const {columns,dataSource} = this.buildColumnsDataSource(resp)
             if(!this.updater.isMounted(this)) return
             this.setState({
                 columnsTab1:columns,
-                dataSourceTab1:_dataSource,
+                dataSourceTab1:dataSource,
                 totalTab1:resp.total
+            })
+        })
+    }
+
+    renderTab2 = () =>{
+        getMaterialEditLogs(this.state.offsetTab2,this.state.limitedTab2)
+        .then(resp=>{
+            const {columns,dataSource} = this.buildColumnsDataSource(resp)
+            if(!this.updater.isMounted(this)) return
+            this.setState({
+                columnsTab2:columns,
+                dataSourceTab2:dataSource,
+                totalTab2:resp.total
             })
         })
     }
@@ -84,10 +168,13 @@ export default class IMLogs extends Component {
                 this.renderTab1()
                 return
             case "tab2":
-                console.log(2)
+                this.renderTab2()
                 return
             case "tab3":
-                console.log(3)
+                console.log('tab3')
+                return
+            case "drawer":
+                this.renderDrawer()
                 return
             default:
                 return
@@ -95,6 +182,38 @@ export default class IMLogs extends Component {
 
     }
 
+    onPageChangeTab = (page, pageSize) =>{
+        switch(this.state.currentTab){
+            case "tab1":
+                this.setState({
+                    offsetTab1:pageSize*(page - 1),
+                    limitedTab1:pageSize
+                  },()=>{
+                    this.getData()
+                })
+                return
+            case "tab2":
+                this.setState({
+                    offsetTab2:pageSize*(page - 1),
+                    limitedTab2:pageSize
+                    },()=>{
+                    this.getData()
+                })
+                return
+            case "drawer":
+                this.setState({
+                    offsetDrawer:pageSize*(page - 1),
+                    limitedDrawer:pageSize
+                    },()=>{
+                    this.getData()
+                })
+                return
+            default:
+                return
+        }  
+    }
+
+    
 
     componentDidMount(){
         this.callback("tab1")
@@ -102,26 +221,67 @@ export default class IMLogs extends Component {
 
     render() {
         return (
-            <div className="tab-container">
-                <Tabs onChange={this.callback} type="card">
-                    <TabPane tab="入库" key="tab1">
-                        <Table 
-                            dataSource = {this.state.dataSourceTab1} 
-                            columns = {this.state.columnsTab1} 
-                            rowKey = {record => record.id}
-                            pagination = {{
-                                total:this.state.totalTab1
-                            }}
-                        />
-                    </TabPane>
-                    <TabPane tab="物料编辑" key="tab2">
-                        Content of Tab Pane 2
-                    </TabPane>
-                    <TabPane tab="其他" key="tab3">
-                        Content of Tab Pane 3
-                    </TabPane>
-                </Tabs>
-            </div>
+            <>
+                <div className="tab-container">
+                    <Tabs onChange={this.callback} type="card">
+                        <TabPane tab="入库" key="tab1">
+                            <Table 
+                                dataSource = {this.state.dataSourceTab1} 
+                                columns = {this.state.columnsTab1} 
+                                rowKey = {record => record.id}
+                                pagination = {{
+                                    total:this.state.totalTab1,
+                                    onChange : this.onPageChangeTab,
+                                }}
+                            />
+                        </TabPane>
+                        <TabPane tab="物料编辑" key="tab2">
+                            <Table 
+                                dataSource = {this.state.dataSourceTab2} 
+                                columns = {this.state.columnsTab2} 
+                                rowKey = {record => record.id}
+                                pagination = {{
+                                    total:this.state.totalTab2,
+                                    onChange : this.onPageChangeTab,
+                                }}
+                            />
+                        </TabPane>
+                        <TabPane tab="其他" key="tab3">
+                            等PM设计好了再做
+                        </TabPane>
+                    </Tabs>
+                </div>
+                <div>
+                    <Drawer
+                        title="入库详情"
+                        placement="right"
+                        closable={true}
+                        onClose={this.onClose}
+                        visible={this.state.visible}
+                        width={800}
+                        destroyOnClose={true}
+                    >
+                        <div style={{width:"700px",padding:"10px"}}>
+                            <Card
+                            bordered={false}
+                            > 
+                            <div>
+                                <Table 
+                                    rowKey={record=>record.uniqueId}
+                                    columns={this.state.columnsDrawer} 
+                                    dataSource={this.state.dataSourceDrawer} 
+                                    pagination={{
+                                        total:this.state.totalDrawer,
+                                        onChange : this.onPageChangeTab,
+                                        pageSize:10
+                                    }}
+                                />
+                            </div>
+                            </Card>
+                        </div>
+                    </Drawer>
+                </div>
+            </>
         )
     }
 }
