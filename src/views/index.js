@@ -126,13 +126,13 @@ const MaterialUpdateList = Loadable({
     loading: Loading
 })
 
-const ProductUpdateList = Loadable({
-    loader: () => import('./ProductUpdateList'),
+const MaterialEdit = Loadable({
+    loader: () => import('./IMList/Edit'),
     loading: Loading
 })
 
-const MaterialEdit = Loadable({
-    loader: () => import('./IMList/Edit'),
+const ProductEdit = Loadable({
+    loader: () => import('./ProductEdit'),
     loading: Loading
 })
 export {
@@ -160,6 +160,6 @@ export {
     NoAuth,
     AdminLogs,
     MaterialUpdateList,
-    ProductUpdateList,
-    MaterialEdit
+    MaterialEdit,
+    ProductEdit
 }

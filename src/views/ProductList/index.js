@@ -8,76 +8,18 @@ import {
     Descriptions,
     Drawer,
 } from 'antd'
+import { getProductList } from '../../requests'
+
 const { Search } = Input
 
-
-
-const dataSource = [
-    {
-        key:'1',
-        id:'1',
-        site:'LKSUS',
-        sku:'zixingchebali-110mm',
-        childAsin:'B07N8VCK2T',
-        title:'Linkin Sport 0-60 Degre Adjustable Bicycle Stem Aluminum Alloy Mountain Bike Stem (31.8mm x 110mm)',
-        image:'http://dummyimage.com/60x60',
-        purchasePrice:8.89,
-        dhlShippingFee:0.00,
-        freightFee:10.00,
-        packageFee:1.00,
-        opFee:6.00,
-        currency:6.50,
-        fbaFullfillmentFee:3.28,
-        shrinkage:0.97,
-        adCost:1.00,
-        amazonReferralFee:'15%',
-        payoneerServiceFee:'1.2%',
-        amazonSalePrice:18.99,
-        margin:44.078,
-        materials:[
-            {
-                name:'huabanbao-hei-201800024',
-                amount:1
-            },
-            {
-                name:'bag-xl',
-                amount:2
-            }
-        ]
-    },
-    {
-        key:'2',
-        id:'2',
-        site:'LKSUS',
-        sku:'huabanbao-hei x 1',
-        childAsin:'B07LBWBKK7',
-        title:'Linkin Sport 32" x 8" Skateboard Carry Bag with Mesh Pouch and Adjustable Shoulder Straps (Black x 1)',
-        image:'http://dummyimage.com/60x60',
-        purchasePrice:10.89,
-        dhlShippingFee:0.00,
-        freightFee:10.00,
-        packageFee:1.00,
-        opFee:6.00,
-        currency:6.50,
-        fbaFullfillmentFee:4.28,
-        shrinkage:1.41,
-        adCost:1.00,
-        amazonReferralFee:'15%',
-        payoneerServiceFee:'1.2%',
-        amazonSalePrice:11.99,
-        margin:5.42,
-        materials:[
-            {
-                name:'ZHeDieYi-Lan-201900119',
-                amount:3
-            },
-            {
-                name:'bag-s',
-                amount:1
-            }
-        ]
-    },
-]
+const titleDisplayMap = {
+    id:'Id',
+    site:'Site',
+    sku: 'SKU',
+    childAsin:'(Child)ASIN',
+    title:'Title',
+    image: 'Image'
+}
 
 export default class ProductList extends Component {
     constructor(){
@@ -87,57 +29,14 @@ export default class ProductList extends Component {
             visible:false,
             detail:{},
             detailKeys:[],
-            materials:[]
+            materials:[],
+            searchword:'',
+            offset:0,
+            limited:10,
+            columns:[],
+            dataSource:[],
+            total:0
         }
-        this.columns = [
-            {
-                title:'Id',
-                dataIndex:'id',
-                key:'id'  
-            },
-            {
-                title:'Site',
-                dataIndex:'site',
-                key:'site'  
-            },
-            {
-                title:'SKU',
-                dataIndex:'sku',
-                key:'sku'  
-            },
-            {
-                title:'(Child)ASIN',
-                dataIndex:'childAsin',
-                key:'childAsin'  
-            },
-            {
-                title:'Title',
-                dataIndex:'title',
-                key:'title',
-                width: 400  
-            },
-            {
-                title:'Image',
-                dataIndex:'image',
-                render:(text,record)=>{
-                    return(
-                        <img src={record.image} alt={record.image} style={{width:"60px",height:"60px"}}/>
-                    )
-                }
-            },
-            {
-                title:'Action',
-                dataIndex:'action',
-                render:(text,record)=>{
-                    return (
-                        <>
-                            <Button size="small" type="primary" onClick={this.onDetailClick.bind(this,record)}>详情</Button>
-                            <Button size="small" type="link" >编辑</Button>
-                        </>
-                    )
-                }
-            }
-        ]
     }
 
     onDetailClick = (record) => {
@@ -152,7 +51,7 @@ export default class ProductList extends Component {
 
     showDrawer = () => {
         const keyArr = Object.keys(this.state.detail)
-        keyArr.splice(0,7)
+        keyArr.splice(0,6)
         keyArr.pop()
         this.setState({
             visible: true,
@@ -172,6 +71,79 @@ export default class ProductList extends Component {
             return
         }
         return this.state.detail[itemKey]
+    }
+
+    createColumns = (columnsKeys) =>{
+        const columns = columnsKeys.map(item=>{
+            if( item === 'image'){
+                return {
+                    title:titleDisplayMap[item],
+                    key:item,
+                    render:(text,record)=>{
+                        return (
+                            <img src={record.image} alt={record.image} style={{width:"60px",height:"60px"}}/>
+                        )
+                    }
+                }
+            }
+            return {
+                title:titleDisplayMap[item],
+                dataIndex:item,
+                key:item
+            }
+        })
+        columns.push({
+            title:'Action',
+            key:'action',
+            render:(text,record)=>{
+              return (
+                <>
+                    <Button size="small" type="primary" onClick={this.onDetailClick.bind(this,record)}>详情</Button>
+                    <Button size="small" type="link" onClick={this.toEdit.bind(this,record)}>编辑</Button>
+                </>
+              )
+            }
+        })
+        return columns
+    }
+
+    toEdit = (record) =>{
+        this.props.history.push(`/erp/comm/product/edit/${record.id}`)
+    }
+    
+    getData = () =>{
+        this.setState({isLoading:true})
+        getProductList(this.state.searchword,this.state.offset,this.state.limited)
+        .then(resp=>{
+            console.log(resp)
+            const columnsKeys = Object.keys(resp.list[0]).splice(0,6)
+            const colunms = this.createColumns(columnsKeys)
+            if(!this.updater.isMounted(this)) return
+            this.setState({
+                columns:colunms,
+                dataSource:resp.list,
+                total:resp.total
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+        .finally(()=>{
+            this.setState({isLoading:false})
+        })
+    }
+
+    onPageChange=(page, pageSize)=>{
+        this.setState({
+          offset:pageSize*(page - 1),
+          limited:pageSize
+        },()=>{
+          this.getData()
+        })
+    }
+
+    componentDidMount(){
+        this.getData()
     }
     render() {
         return (
@@ -193,8 +165,14 @@ export default class ProductList extends Component {
                         </div>
                         <Table
                             rowKey={record=>record.id}
-                            dataSource={dataSource}
-                            columns={this.columns}
+                            dataSource={this.state.dataSource}
+                            columns={this.state.columns}
+                            pagination={{
+                                total:this.state.total,
+                                onChange : this.onPageChange,
+                                showQuickJumper:true,
+                                current: this.state.offset / this.state.limited + 1
+                            }}
                         />
                     </Card>
                 </Spin>
@@ -238,3 +216,4 @@ export default class ProductList extends Component {
         )
     }
 }
+ 

@@ -21,7 +21,7 @@ import {
     NoAuth,
     AdminLogs,
     MaterialUpdateList,
-    ProductUpdateList,
+    ProductEdit,
     MaterialEdit
     
 } from '../views'
@@ -72,6 +72,7 @@ export const commonRoutes = {
         title:'日志',
         icon:'container'
     }],
+
     productRoutes:[{
        pathname:'/erp/comm/product/list' ,
        component:ProductList,
@@ -103,11 +104,8 @@ export const commonRoutes = {
         title:'预出库记录',
         icon:'menu'
      },{
-        pathname:'/erp/comm/product/update' ,
-        component:ProductUpdateList,
-        isNav:true,
-        title:'修改',
-        icon:'tool'
+        pathname:'/erp/comm/product/edit/:id' ,
+        component:ProductEdit,
      },{
         pathname:'/erp/comm/product/logs' ,
         component:ProductLogs,

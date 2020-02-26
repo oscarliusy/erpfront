@@ -80,3 +80,19 @@ export const getInstockDetailById = (id,offset = 0, limited = 10) =>{
         limited
     })
 }
+
+export const getProductList = (keyword,offset=0,limited=10)=>{
+    return service.post('/api/v1/product/list',{
+        keyword,
+        offset,
+        limited
+    })
+}
+
+export const getProductDetailById = (id) =>{
+    return service.post(`/api/v1/product/detail/${id}`)
+}
+
+export const saveProductEdit = (params)=>{
+    return service.post('/api/v1/product/edit',params)
+}
