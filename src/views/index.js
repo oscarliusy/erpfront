@@ -76,8 +76,8 @@ const ProductOutstock = Loadable({
     loading: Loading
 })
 
-const PreOutstock = Loadable({
-    loader: () => import('./PreOutstock'),
+const PreOutstockAdd = Loadable({
+    loader: () => import('./PreOutstockAdd'),
     loading: Loading
 })
 
@@ -135,6 +135,12 @@ const ProductEdit = Loadable({
     loader: () => import('./ProductEdit'),
     loading: Loading
 })
+
+const PreoutstockEdit = Loadable({
+    loader: () => import('./PreoutstockEdit'),
+    loading: Loading
+})
+
 export {
     SignIn,
     SignUp,
@@ -150,7 +156,7 @@ export {
     ProductList,
     ProductAdd,
     ProductOutstock,
-    PreOutstock,
+    PreOutstockAdd,
     PreOutstockList,
     ProductLogs,
     ProductDetail,
@@ -161,5 +167,6 @@ export {
     AdminLogs,
     MaterialUpdateList,
     MaterialEdit,
-    ProductEdit
+    ProductEdit,
+    PreoutstockEdit
 }

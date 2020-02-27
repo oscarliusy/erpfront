@@ -12,7 +12,7 @@ import {
     ProductList,
     ProductAdd,
     ProductOutstock,
-    PreOutstock,
+    PreOutstockAdd,
     PreOutstockList,
     ProductLogs,
     Notifications,
@@ -22,7 +22,8 @@ import {
     AdminLogs,
     MaterialUpdateList,
     ProductEdit,
-    MaterialEdit
+    MaterialEdit,
+    PreoutstockEdit
     
 } from '../views'
 
@@ -93,15 +94,12 @@ export const commonRoutes = {
         icon:'shopping-cart'
      },{
         pathname:'/erp/comm/product/preoutstock/add' ,
-        component:PreOutstock,
-        isNav:true,
-        title:'新建预出库',
-        icon:'car'
+        component:PreOutstockAdd,
      },{
-        pathname:'/erp/comm/product/preoutstocklist' ,
+        pathname:'/erp/comm/product/preoutstock/list' ,
         component:PreOutstockList,
         isNav:true,
-        title:'预出库记录',
+        title:'预出库',
         icon:'menu'
      },{
         pathname:'/erp/comm/product/edit/:id' ,
@@ -115,7 +113,11 @@ export const commonRoutes = {
      },{
         pathname:'/erp/comm/product/detail/:id',
         component:ProductLogs
-     }],
+     },{
+        pathname:'/erp/comm/product/preoutstock/edit/:id',
+        component:PreoutstockEdit
+     }
+    ],
     userRoutes:[{
         pathname:'/erp/comm/user/notifications',
         component:Notifications,

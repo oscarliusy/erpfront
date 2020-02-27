@@ -100,3 +100,10 @@ export const saveProductEdit = (params)=>{
 export const postProductAdd = (params)=>{
     return service.post('/api/v1/product/add',params)
 }
+
+export const getPreoutstockList = (offset=0,limited=10) =>{
+    return service.post('/api/v1/preoutstock/list',{
+        offset,
+        limited
+    })
+}
