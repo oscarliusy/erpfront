@@ -92,10 +92,10 @@ export const commonRoutes = {
         title:'出库',
         icon:'shopping-cart'
      },{
-        pathname:'/erp/comm/product/preoutstock' ,
+        pathname:'/erp/comm/product/preoutstock/add' ,
         component:PreOutstock,
         isNav:true,
-        title:'预出库',
+        title:'新建预出库',
         icon:'car'
      },{
         pathname:'/erp/comm/product/preoutstocklist' ,

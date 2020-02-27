@@ -96,3 +96,7 @@ export const getProductDetailById = (id) =>{
 export const saveProductEdit = (params)=>{
     return service.post('/api/v1/product/edit',params)
 }
+
+export const postProductAdd = (params)=>{
+    return service.post('/api/v1/product/add',params)
+}

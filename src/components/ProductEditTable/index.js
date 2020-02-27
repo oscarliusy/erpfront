@@ -207,7 +207,7 @@ class ProductEditTable extends Component {
       return (
         <div>
             <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                Add a row
+                增加物料项
             </Button>
             <Table 
                 components={components}

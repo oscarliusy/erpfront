@@ -115,7 +115,7 @@ export default class ProductList extends Component {
         this.setState({isLoading:true})
         getProductList(this.state.searchword,this.state.offset,this.state.limited)
         .then(resp=>{
-            console.log(resp)
+            //console.log(resp)
             const columnsKeys = Object.keys(resp.list[0]).splice(0,6)
             const colunms = this.createColumns(columnsKeys)
             if(!this.updater.isMounted(this)) return

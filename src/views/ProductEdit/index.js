@@ -14,7 +14,7 @@ import {
     Table
 } from 'antd'
 import axios from 'axios'
-import { saveProductConstructTable } from '../../actions/productTable'
+import { saveProductConstructTable,resetProductConstructTable } from '../../actions/productTable'
 import { connect } from 'react-redux'
 import { ProductEditTable } from '../../components'
 import { getProductDetailById,instockMaterialSearch,saveProductEdit } from '../../requests'
@@ -44,7 +44,7 @@ const mapState = (state) =>{
     } 
 }
 
-@connect(mapState,{ saveProductConstructTable })
+@connect(mapState,{ saveProductConstructTable,resetProductConstructTable })
 @Form.create()
 class ProductEdit extends Component {
     constructor(){
@@ -112,12 +112,14 @@ class ProductEdit extends Component {
                     saveProductEdit(params)          
                     .then(resp=>{
                         message.success(resp.msg)
+                        this.props.resetProductConstructTable()
                     })
                     .catch(err=>{
                         console.log(err)
                     })
                     .finally(()=>{
-                        this.setState({isSpin:false})
+                        this.setState({isSpin:false})      
+                        this.props.history.push('/erp/comm/product/list')
                     })
                 }
               }else{

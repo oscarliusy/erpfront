@@ -8,3 +8,9 @@ export const saveProductConstructTable = (newState) =>{
         }
     }
 }
+
+export const resetProductConstructTable = () =>{
+    return {
+        type:actionTypes.RESET_PRODUCT_CONSTRUCT_TABLE
+    }
+}
