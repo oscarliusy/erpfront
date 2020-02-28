@@ -87,12 +87,6 @@ export const commonRoutes = {
         title:'新品',
         icon:'bulb'
      },{
-        pathname:'/erp/comm/product/outstock' ,
-        component:ProductOutstock,
-        isNav:true,
-        title:'出库',
-        icon:'shopping-cart'
-     },{
         pathname:'/erp/comm/product/preoutstock/add' ,
         component:PreOutstockAdd,
      },{
@@ -101,6 +95,12 @@ export const commonRoutes = {
         isNav:true,
         title:'预出库',
         icon:'menu'
+     },{
+        pathname:'/erp/comm/product/outstock' ,
+        component:ProductOutstock,
+        isNav:true,
+        title:'批量出库',
+        icon:'shopping-cart'
      },{
         pathname:'/erp/comm/product/edit/:id' ,
         component:ProductEdit,
