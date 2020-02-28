@@ -107,3 +107,17 @@ export const getPreoutstockList = (offset=0,limited=10) =>{
         limited
     })
 }
+
+export const getPreoutstockById = (id) =>{
+    return service.post(`/api/v1/product/preoutstock/${id}`)
+}
+
+//params={keyword,offset,limited}
+export const preoutstockProductSearch = (params) =>{
+    return service.post('/api/v1/product/preoutstock/search',params)
+}
+
+//params={keyword,offset,limited}
+export const postPreoutstockEdit = (params) =>{
+    return service.post('/api/v1/product/preoutstock/edit',params)
+}
