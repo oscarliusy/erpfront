@@ -3,7 +3,7 @@ import {
     Tabs,
     Table,
     Button,
-  
+    Spin,
     Drawer,
     Card
  } from 'antd'
@@ -52,7 +52,10 @@ export default class IMLogs extends Component {
             dataSourceDrawer:[],
             offsetDrawer:0,
             limitedDrawer:10,
-            totalDrawer:0
+            totalDrawer:0,
+
+            isLoadingTab:false,
+            isLoadingDrawer:false
         }
     }
 
@@ -64,13 +67,13 @@ export default class IMLogs extends Component {
         })
     }
 
-
     toInstockDetail = (record) =>{
         this.setState({
             idDrawer:record.id
         })
         this.showDrawer()
     }
+
     showDrawer = () => {
         this.setState({
           visible: true,
@@ -88,6 +91,9 @@ export default class IMLogs extends Component {
     }
 
     renderDrawer = () => {
+        this.setState({
+            isLoadingDrawer:true
+        })
         getInstockDetailById(
             this.state.idDrawer,
             this.state.offsetDrawer,
@@ -101,6 +107,14 @@ export default class IMLogs extends Component {
                 dataSourceDrawer:dataSource,
                 totalDrawer:resp.total
             })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+        .finally(()=>{
+            this.setState({
+                isLoadingDrawer:false
+            }) 
         })
     }
 
@@ -137,6 +151,9 @@ export default class IMLogs extends Component {
     }
 
     renderTab1=()=>{
+        this.setState({
+            isLoadingTab:true
+        })
         getMaterialInstockLogs(this.state.offsetTab1,this.state.limitedTab1)
         .then(resp=>{
             const {columns,dataSource} = this.buildColumnsDataSource(resp)
@@ -147,9 +164,20 @@ export default class IMLogs extends Component {
                 totalTab1:resp.total
             })
         })
+        .catch(err=>{
+            console.log(err)
+        })
+        .finally(()=>{
+            this.setState({
+                isLoadingTab:false
+            }) 
+        })
     }
 
     renderTab2 = () =>{
+        this.setState({
+            isLoadingTab:true
+        })
         getMaterialEditLogs(this.state.offsetTab2,this.state.limitedTab2)
         .then(resp=>{
             const {columns,dataSource} = this.buildColumnsDataSource(resp)
@@ -159,6 +187,14 @@ export default class IMLogs extends Component {
                 dataSourceTab2:dataSource,
                 totalTab2:resp.total
             })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+        .finally(()=>{
+            this.setState({
+                isLoadingTab:false
+            }) 
         })
     }
 
@@ -213,8 +249,6 @@ export default class IMLogs extends Component {
         }  
     }
 
-    
-
     componentDidMount(){
         this.callback("tab1")
     }
@@ -222,6 +256,7 @@ export default class IMLogs extends Component {
     render() {
         return (
             <>
+                <Spin spinning={this.state.isLoadingTab}>
                 <div className="tab-container">
                     <Tabs onChange={this.callback} type="card">
                         <TabPane tab="入库" key="tab1">
@@ -251,6 +286,8 @@ export default class IMLogs extends Component {
                         </TabPane>
                     </Tabs>
                 </div>
+                </Spin>
+                
                 <div>
                     <Drawer
                         title="入库详情"
@@ -265,22 +302,25 @@ export default class IMLogs extends Component {
                             <Card
                             bordered={false}
                             > 
-                            <div>
-                                <Table 
-                                    rowKey={record=>record.uniqueId}
-                                    columns={this.state.columnsDrawer} 
-                                    dataSource={this.state.dataSourceDrawer} 
-                                    pagination={{
-                                        total:this.state.totalDrawer,
-                                        onChange : this.onPageChangeTab,
-                                        pageSize:10
-                                    }}
-                                />
-                            </div>
+                                <Spin spinning={this.state.isLoadingDrawer}>
+                                    <div>
+                                        <Table 
+                                            rowKey={record=>record.uniqueId}
+                                            columns={this.state.columnsDrawer} 
+                                            dataSource={this.state.dataSourceDrawer} 
+                                            pagination={{
+                                                total:this.state.totalDrawer,
+                                                onChange : this.onPageChangeTab,
+                                                pageSize:10
+                                            }}
+                                        />
+                                    </div>
+                                </Spin>
                             </Card>
-                        </div>
+                        </div> 
                     </Drawer>
                 </div>
+               
             </>
         )
     }

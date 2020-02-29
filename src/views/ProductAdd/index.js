@@ -261,6 +261,10 @@ class ProductAdd extends Component {
         })
     }
 
+    componentDidMount(){
+        this.props.resetProductConstructTable()
+    }
+
     render() {
         const { getFieldDecorator } = this.props.form
         return (

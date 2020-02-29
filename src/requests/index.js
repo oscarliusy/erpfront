@@ -126,3 +126,44 @@ export const postPreoutstockEdit = (params) =>{
 export const postPreoutstockAdd = (params) =>{
     return service.post('/api/v1/product/preoutstock/add',params)
 }
+
+export const getProductEditLogs = (offset = 0, limited = 10) =>{
+    return service.post('/api/v1/product/editlog',{
+        offset,
+        limited
+    })
+}
+
+export const getProductOutstockLogs = (offset = 0, limited = 10) =>{
+    return service.post('/api/v1/product/outstocklog',{
+        offset,
+        limited
+    })
+}
+
+export const getOutstockDetailById = (id,offset = 0, limited = 10) =>{
+    return service.post(`/api/v1/product/outstock/${id}`,{
+        offset,
+        limited
+    })
+}
+
+export const getSiteCurrency = () =>{
+    return service.post('/api/v1/currency/site')
+}
+
+export const modifySiteCurrency = (siteInfo) => {
+    return service.post('/api/v1/currency/sitemodify',{
+        siteInfo
+    })
+}
+
+export const getExchangeRate = () =>{
+    return service.post('/api/v1/currency/exchangerate')
+}
+
+export const setExchangeRate = (exchangeRate) =>{
+    return service.post('/api/v1/currency/setexchangerate',{
+        exchangeRate
+    })
+}
