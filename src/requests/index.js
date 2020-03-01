@@ -175,3 +175,12 @@ export const getAccountList = (keyword,offset = 0, limited = 10) =>{
         limited
     })
 }
+
+export const getAccountDetailById = (id) =>{
+    return service.post(`/api/v1/account/detail/${id}`)
+}
+
+//params={id,department,position,authority,status}
+export const postAccountDetailEdit = (params) =>{
+    return service.post('/api/v1/account/edit',params)
+}
