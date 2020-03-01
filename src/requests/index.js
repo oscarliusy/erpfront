@@ -167,3 +167,11 @@ export const setExchangeRate = (exchangeRate) =>{
         exchangeRate
     })
 }
+
+export const getAccountList = (keyword,offset = 0, limited = 10) =>{
+    return service.post('/api/v1/account/list',{
+        keyword,
+        offset,        
+        limited
+    })
+}

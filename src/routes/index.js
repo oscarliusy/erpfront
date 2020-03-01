@@ -159,9 +159,6 @@ export const adminRoutes = [{
 },{
     pathname:'/erp/admin/account/:id',
     component:Manage,
-    isNav:true,
-    title:'账号设置',
-    icon:'usergroup-add'
 },{
     pathname:'/erp/admin/logs',
     component:AdminLogs,
