@@ -34,7 +34,7 @@ export default class UserList extends Component {
     }
 
     toEdit = (record) =>{
-        this.props.history.push(`/erp/admin/account/${record.id}`)
+        this.props.history.push(`/erp/admin/account/detail/${record.id}`)
     }
 
     onSearch = (value)=>{
@@ -127,6 +127,10 @@ export default class UserList extends Component {
         })
     }
 
+    toSignUp = () =>{
+        this.props.history.push('/erp/admin/account/signup')
+    }
+
     componentDidMount(){
         this.getData()
     }
@@ -137,6 +141,7 @@ export default class UserList extends Component {
                 <Card
                     title={<span>用户总数：{this.state.total}</span>}
                     bordered={false}
+                    extra={<Button onClick={this.toSignUp}>新用户注册</Button>} 
                 >
                      <div style={{width:"600px",padding:"10px"}}>
                         <Search

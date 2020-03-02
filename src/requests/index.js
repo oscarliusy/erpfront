@@ -184,3 +184,8 @@ export const getAccountDetailById = (id) =>{
 export const postAccountDetailEdit = (params) =>{
     return service.post('/api/v1/account/edit',params)
 }
+
+//params={username,gender,entryAt,identityNumber,resume,department,position,authority,status}
+export const postSignUp = (params) =>{
+    return service.post('/api/v1/account/signup',params)
+}

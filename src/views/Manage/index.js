@@ -16,6 +16,7 @@ import {
 import './manage.less'
 import { getAccountDetailById,postAccountDetailEdit } from '../../requests'
 import moment from 'moment'
+import { HRSETTINGS } from '../../constants'
 
 const { Option } = Select
 
@@ -27,15 +28,6 @@ const formLayout = {
         span:8
     }
 }
-
-//下面的常数要么放进数据库，要么放进一个专门管常量的地方管理起来。
-const departmentList = ['产品部','运营部','技术部','后勤部']
-const positionList = ['经理','主管','专员','实习']
-const plainOptions = ['001', '002', '003']
-const tooltip = {
-    authority:'001:物料/产品的查阅/新增/出入库. 002：物料/产品的编辑/删除.003:其余高级功能'
-}
-
 
 @Form.create()
 class Manage extends Component {
@@ -149,7 +141,7 @@ class Manage extends Component {
                                             style={{ width: 200 }} 
                                         >
                                             {
-                                                departmentList.map(item=>{
+                                                HRSETTINGS.DEPARTMENT_LIST.map(item=>{
                                                     return(
                                                         <Option value={item} key={item}>{item}</Option>
                                                     )
@@ -174,7 +166,7 @@ class Manage extends Component {
                                             style={{ width: 200 }} 
                                         >
                                             {
-                                                positionList.map(item=>{
+                                                HRSETTINGS.POSITION_LIST.map(item=>{
                                                     return(
                                                         <Option value={item} key={item}>{item}</Option>
                                                     )
@@ -187,7 +179,7 @@ class Manage extends Component {
                         </Row>
                         <Row>
                             <Col span={12}>
-                                <Tooltip title={tooltip.authority}>
+                                <Tooltip title={HRSETTINGS.TOOLTIP.AUTHORITY}>
                                 <Form.Item label="权限" >
                                     {getFieldDecorator('authority', {
                                         rules: [
@@ -201,7 +193,7 @@ class Manage extends Component {
                                         <Checkbox.Group >
                                             <Row>
                                             {
-                                                plainOptions.map(item=>{
+                                                HRSETTINGS.PLAIN_OPTIONS.map(item=>{
                                                     return (
                                                         <Col span={10} key={item}>
                                                             <Checkbox value={item}>{item}</Checkbox>

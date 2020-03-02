@@ -31,9 +31,6 @@ export const mainRoutes = [{
     pathname:'/signin',
     component:SignIn
 },{
-    pathname:'/signup',
-    component:SignUp
-},{
     pathname:'/404',
     component:NotFound
 }]
@@ -157,7 +154,7 @@ export const adminRoutes = [{
     title:'账号管理',
     icon:'team'
 },{
-    pathname:'/erp/admin/account/:id',
+    pathname:'/erp/admin/account/detail/:id',
     component:Manage,
 },{
     pathname:'/erp/admin/logs',
@@ -165,4 +162,7 @@ export const adminRoutes = [{
     isNav:true,
     title:'日志',
     icon:'container'
+},{
+    pathname:'/erp/admin/account/signup',
+    component:SignUp
 }]
