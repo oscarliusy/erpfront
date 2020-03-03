@@ -3,9 +3,18 @@ import { Layout, Menu, Icon,Dropdown,Avatar,Badge } from 'antd'
 import { withRouter } from 'react-router-dom'
 import logo  from './logo.png'
 import './Frame.less'
+import { connect } from 'react-redux' 
+import {signOut } from '../../actions/user'
+
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
+const mapState=(state)=>({
+    username:state.user.username,
+    avatar:state.user.avatar
+})
+
+@connect(mapState,{ signOut })
 @withRouter
 class Frame extends Component {
     constructor(){
@@ -42,7 +51,9 @@ class Frame extends Component {
     }
 
     onDropdownMenuClick=({key})=>{
-        
+        if(key === '/signin'){
+            this.props.signOut()
+        }
         this.props.history.push({pathname:key})
     }
 
@@ -61,7 +72,7 @@ class Frame extends Component {
             个人设置
           </Menu.Item>
           <Menu.Item
-            key="/login"
+            key="/signin"
           >
             退出登录(bug)
           </Menu.Item>
@@ -78,8 +89,8 @@ class Frame extends Component {
                     </div> 
                     <Dropdown overlay={this.renderDropdown()} trigger={['click','hover']}>
                         <div style={{display:'flex',alignItems:'center'}}> 
-                            <Avatar  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                            <span>欢迎您！oscar</span> 
+                            <Avatar  src={this.props.avatar} />
+                            <span>欢迎您！{this.props.username}</span> 
                             <Badge count="10" offset={[0,0]}>
                             <Icon type="down" />
                             </Badge> 

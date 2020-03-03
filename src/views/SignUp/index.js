@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { HRSETTINGS } from '../../constants'
+import { HRSETTINGS,IMAGE_UPLOADER  } from '../../constants'
 import moment from 'moment'
 import {
     Card,
@@ -46,12 +46,12 @@ class SignUp extends Component {
 
     handleUploadImage = ({file}) =>{
         const data = new FormData()
-        data.append('Token','8fe17a2751e28f842c1ca5b304717968c7e60a71:NL0_25owASxQHc5mLS4QyxSRReU=:eyJkZWFkbGluZSI6MTU4MTkwOTg2MiwiYWN0aW9uIjoiZ2V0IiwidWlkIjoiNzA5ODUwIiwiYWlkIjoiMTY2NDE1MCIsImZyb20iOiJmaWxlIn0=')
+        data.append('Token',IMAGE_UPLOADER.TOKEN)
         data.append('file',file)
         this.setState({
             isUploading:true
         })
-        axios.post("http://up.imgapi.com/",data)
+        axios.post(IMAGE_UPLOADER.URL,data)
         .then(resp=>{
             //console.log(resp)
             if(resp.status === 200){
@@ -131,6 +131,19 @@ class SignUp extends Component {
                             >
                                 <Row>
                                     <Col span={16} >
+                                        <Form.Item label="登录邮箱" >
+                                            {getFieldDecorator('email', {
+                                                rules: [
+                                                    {
+                                                        required:true,
+                                                        message:'email是必须填写的'
+                                                    }
+                                                ],
+                                                
+                                                })(
+                                                <Input />
+                                            )}                        
+                                        </Form.Item>
                                         <Form.Item label="姓名" >
                                             {getFieldDecorator('username', {
                                                 rules: [

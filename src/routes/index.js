@@ -42,33 +42,39 @@ export const commonRoutes = {
         component:IMList,
         isNav:true,
         title:'库存',
-        icon:'home'
+        icon:'home',
+        roles:['001','002','003']
     },{
         pathname:'/erp/comm/material/edit/:id',
-        component:MaterialEdit
+        component:MaterialEdit,
+        roles:['002','003']
     },{
         pathname:'/erp/comm/material/add',
         component:MaterialAdd,
         isNav:true,
         title:'新品',
-        icon:'bulb'
+        icon:'bulb',
+        roles:['001','002','003']
     },{
         pathname:'/erp/comm/material/instock',
         component:Instock,
         isNav:true,
         title:'入库',
-        icon:'import'
+        icon:'import',
+        roles:['001','002','003']
     },{
         pathname:'/erp/comm/material/update',
         component:MaterialUpdateList,
         title:'修改',
-        icon:'tool'
+        icon:'tool',
+        roles:['002','003']
     },{
         pathname:'/erp/comm/material/logs',
         component:IMLogs,
         isNav:true,
         title:'日志',
-        icon:'container'
+        icon:'container',
+        roles:['001','002','003']
     }],
 
     productRoutes:[{
@@ -76,64 +82,73 @@ export const commonRoutes = {
        component:ProductList,
        isNav:true,
        title:'清单',
-       icon:'shop'
+       icon:'shop',
+       roles:['001','002','003']
     },{
         pathname:'/erp/comm/product/add' ,
         component:ProductAdd,
         isNav:true,
         title:'新品',
-        icon:'bulb'
+        icon:'bulb',
+        roles:['001','002','003']
      },{
         pathname:'/erp/comm/product/preoutstock/add' ,
         component:PreOutstockAdd,
+        roles:['001','002','003']
      },{
         pathname:'/erp/comm/product/preoutstock/list' ,
         component:PreOutstockList,
         isNav:true,
         title:'预出库',
-        icon:'menu'
+        icon:'menu',
+        roles:['001','002','003']
      },{
         pathname:'/erp/comm/product/outstock' ,
         component:ProductOutstock,
         isNav:true,
         title:'批量出库',
-        icon:'shopping-cart'
+        icon:'shopping-cart',
+        roles:['001','002','003']
      },{
         pathname:'/erp/comm/product/edit/:id' ,
         component:ProductEdit,
+        roles:['002','003']
      },{
         pathname:'/erp/comm/product/logs' ,
         component:ProductLogs,
         isNav:true,
         title:'日志',
-        icon:'container'
-     },{
-        pathname:'/erp/comm/product/detail/:id',
-        component:ProductLogs
+        icon:'container',
+        roles:['001','002','003']
      },{
         pathname:'/erp/comm/product/preoutstock/edit/:id',
-        component:PreoutstockEdit
+        component:PreoutstockEdit,
+        roles:['001','002','003']
      }
     ],
     userRoutes:[{
         pathname:'/erp/comm/user/notifications',
         component:Notifications,
         isNav:true,
+        roles:['001','002','003']
     },{
         pathname:'/erp/comm/user/dashboard',
         component:Dashboard,
         isNav:true,
         title:'仪表盘',
-        icon:'dashboard'
+        icon:'dashboard',
+        roles:['001','002','003']
     },{
         pathname:'/erp/comm/user/profile/:id',
         component:Profile,
         isNav:true,
         title:'个人信息',
-        icon:'user'
+        icon:'user',
+        roles:['001','002','003']
     },{
         pathname:'/erp/comm/user/noauth',
-        component:NoAuth
+        component:NoAuth,
+        roles:['001','002','003']
     }]
 }
 
@@ -146,23 +161,28 @@ export const adminRoutes = [{
     component:Currency,
     isNav:true,
     title:'修改汇率',
-    icon:'dollar'
+    icon:'dollar',
+    roles:['002','003']
 },{
     pathname:'/erp/admin/account/list',
     component:UserList,
     isNav:true,
     title:'账号管理',
-    icon:'team'
+    icon:'team',
+    roles:['002','003']
 },{
     pathname:'/erp/admin/account/detail/:id',
     component:Manage,
+    roles:['002','003']
 },{
     pathname:'/erp/admin/logs',
     component:AdminLogs,
     isNav:true,
     title:'日志',
-    icon:'container'
+    icon:'container',
+    roles:['002','003']
 },{
     pathname:'/erp/admin/account/signup',
-    component:SignUp
+    component:SignUp,
+    roles:['003']
 }]

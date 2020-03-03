@@ -6,6 +6,10 @@ const service = axios.create({
     baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/245040' : ''
 })
 
+const serviceNoauth = axios.create({
+    baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/245040' : ''
+})
+
 service.interceptors.request.use((config)=>{
     config.data = Object.assign({},config.data,{
         //authToken:window.localStorage.getItem('authToken')
@@ -188,4 +192,17 @@ export const postAccountDetailEdit = (params) =>{
 //params={username,gender,entryAt,identityNumber,resume,department,position,authority,status}
 export const postSignUp = (params) =>{
     return service.post('/api/v1/account/signup',params)
+}
+
+//params = { id,username,password,avatar}
+export const profileEditPost = (params) =>{
+    return service.post('/api/v1/account/profile',{params})
+}
+
+//signInInfo = { email, password}
+export const signInRequest = (signInInfo) =>{
+    return serviceNoauth.post('/api/v1/signin',{
+        email:signInInfo.email,
+        password:signInInfo.email
+    })
 }

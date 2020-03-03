@@ -13,6 +13,12 @@ const HRSETTINGS = {
     }
 }
 
+const IMAGE_UPLOADER = {
+    URL:"http://up.imgapi.com/",
+    TOKEN:'8fe17a2751e28f842c1ca5b304717968c7e60a71:NL0_25owASxQHc5mLS4QyxSRReU=:eyJkZWFkbGluZSI6MTU4MTkwOTg2MiwiYWN0aW9uIjoiZ2V0IiwidWlkIjoiNzA5ODUwIiwiYWlkIjoiMTY2NDE1MCIsImZyb20iOiJmaWxlIn0='
+}
+
 export { 
     HRSETTINGS,
+    IMAGE_UPLOADER,
 }
