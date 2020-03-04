@@ -141,6 +141,11 @@ const PreoutstockEdit = Loadable({
     loading: Loading
 })
 
+const InstockUpload = Loadable({
+    loader: () => import('./InstockUpload'),
+    loading: Loading
+})
+
 export {
     SignIn,
     SignUp,
@@ -168,5 +173,6 @@ export {
     MaterialUpdateList,
     MaterialEdit,
     ProductEdit,
-    PreoutstockEdit
+    PreoutstockEdit,
+    InstockUpload
 }

@@ -10,7 +10,7 @@ import {
 import './imlogs.less'
 import moment from 'moment'
 import {getMaterialEditLogs,getMaterialInstockLogs,getInstockDetailById} from '../../requests'
-
+ 
 const { TabPane } = Tabs
 const titleDisplayMap = {
     id:'编号',

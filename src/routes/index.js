@@ -23,7 +23,8 @@ import {
     MaterialUpdateList,
     ProductEdit,
     MaterialEdit,
-    PreoutstockEdit
+    PreoutstockEdit,
+    InstockUpload
     
 } from '../views'
 
@@ -61,6 +62,13 @@ export const commonRoutes = {
         isNav:true,
         title:'入库',
         icon:'import',
+        roles:['001','002','003']
+    },{
+        pathname:'/erp/comm/material/instockupload',
+        component:InstockUpload,
+        isNav:true,
+        title:'批量入库',
+        icon:'car',
         roles:['001','002','003']
     },{
         pathname:'/erp/comm/material/update',

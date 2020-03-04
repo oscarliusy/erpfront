@@ -206,3 +206,17 @@ export const signInRequest = (signInInfo) =>{
         password:signInInfo.email
     })
 }
+
+export const getAccountCurrencyLogs = (offset = 0, limited = 10) =>{
+    return service.post('/api/v1/account/logs/currency',{
+        offset,
+        limited
+    })
+}
+
+export const getAccountManageLogs = (offset = 0, limited = 10) =>{
+    return service.post('/api/v1/account/logs/manage',{
+        offset,
+        limited
+    })
+}
