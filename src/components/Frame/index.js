@@ -5,16 +5,19 @@ import logo  from './logo.png'
 import './Frame.less'
 import { connect } from 'react-redux' 
 import {signOut } from '../../actions/user'
+import { updateNotificationList } from '../../actions/notification'
+import { socket } from '../../requests'
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 const mapState=(state)=>({
     username:state.user.username,
-    avatar:state.user.avatar
+    avatar:state.user.avatar,
+    unreadNotifacationNumber:state.notification.unread
 })
 
-@connect(mapState,{ signOut })
+@connect(mapState,{ signOut,updateNotificationList })
 @withRouter
 class Frame extends Component {
     constructor(){
@@ -62,7 +65,7 @@ class Frame extends Component {
           <Menu.Item
             key="/erp/comm/user/notifications"
           >
-            <Badge dot={true}>
+            <Badge dot={Boolean(this.props.unreadNotifacationNumber)}>
               通知中心
             </Badge>
           </Menu.Item>
@@ -74,10 +77,21 @@ class Frame extends Component {
           <Menu.Item
             key="/signin"
           >
-            退出登录(bug)
+            退出登录
           </Menu.Item>
         </Menu>
-      );
+      )
+
+    initNotificationList = () =>{
+        socket.emit('signIn')
+        socket.on('updateNotificationList',(msgObj)=>{
+            this.props.updateNotificationList(msgObj)
+        })
+    }
+
+    componentDidMount(){
+        this.initNotificationList()
+    }
 
     render() {
         //console.log(this.props)
@@ -91,7 +105,7 @@ class Frame extends Component {
                         <div style={{display:'flex',alignItems:'center'}}> 
                             <Avatar  src={this.props.avatar} />
                             <span>欢迎您！{this.props.username}</span> 
-                            <Badge count="10" offset={[0,0]}>
+                            <Badge count={this.props.unreadNotifacationNumber} offset={[0,0]}>
                             <Icon type="down" />
                             </Badge> 
                         </div>      

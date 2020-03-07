@@ -1,5 +1,9 @@
 import axios from 'axios'
 import {message} from 'antd'
+import io from 'socket.io-client'
+
+export const socket = io('http://localhost:4000')
+
 const isDev = process.env.NODE_ENV === 'development'
 
 const service = axios.create({
