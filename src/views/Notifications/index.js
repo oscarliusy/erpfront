@@ -9,7 +9,7 @@ import {
     Avatar,
 } from 'antd'
 import { connect} from 'react-redux'
-import { socket } from '../../requests'
+//import { socket } from '../../requests'
 
 const mapState = (state) =>{
     const {
@@ -24,14 +24,14 @@ const mapState = (state) =>{
 
 @connect(mapState)
 class Notifications extends Component {
-    markNotificationHasreadById = (id) =>{
-        //console.log(id)
-        socket.emit('markHasreadById',(id))
-    }
+    // markNotificationHasreadById = (id) =>{
+    //     //console.log(id)
+    //     socket.emit('markHasreadById',(id))
+    // }
 
-    markAllNotificationsHasread = () =>{
-        socket.emit('markAllHasread')
-    }
+    // markAllNotificationsHasread = () =>{
+    //     socket.emit('markAllHasread')
+    // }
     render() {
         return (
             <>

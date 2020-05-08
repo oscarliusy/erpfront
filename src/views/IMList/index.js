@@ -23,9 +23,9 @@ const titleDisplayMap = {
         id:'编号',
         uniqueId:'唯一识别码',
         amount: '库存数量',
-        desc:'详细信息',
-        purchaser:'采购人',
-        cost: '采购价(￥)',
+        description:'详细信息',
+        userPurchase_id:'采购人',
+        price: '采购价(￥)',
         image:'缩略图',
         isLoading:false
 }

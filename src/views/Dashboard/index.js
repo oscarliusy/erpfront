@@ -64,6 +64,7 @@ class Dashboard extends Component {
     componentDidUpdate(){
         this.initSaleListChart()
     }
+
     render() {
         return (
             <>

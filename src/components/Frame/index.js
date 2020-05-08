@@ -6,7 +6,7 @@ import './Frame.less'
 import { connect } from 'react-redux' 
 import {signOut } from '../../actions/user'
 import { updateNotificationList } from '../../actions/notification'
-import { socket } from '../../requests'
+//import { socket } from '../../requests'
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -82,15 +82,15 @@ class Frame extends Component {
         </Menu>
       )
 
-    initNotificationList = () =>{
-        socket.emit('signIn')
-        socket.on('updateNotificationList',(msgObj)=>{
-            this.props.updateNotificationList(msgObj)
-        })
-    }
+    // initNotificationList = () =>{
+    //     socket.emit('signIn')
+    //     socket.on('updateNotificationList',(msgObj)=>{
+    //         this.props.updateNotificationList(msgObj)
+    //     })
+    // }
 
     componentDidMount(){
-        this.initNotificationList()
+        //this.initNotificationList()
     }
 
     render() {

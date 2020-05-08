@@ -1,8 +1,8 @@
 import axios from 'axios'
 import {message} from 'antd'
-import io from 'socket.io-client'
+//import io from 'socket.io-client'
 
-export const socket = io('http://localhost:4000')
+//export const socket = io('http://localhost:4000')
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -32,12 +32,35 @@ service.interceptors.response.use((resp)=>{
     }
 })
 
+const serviceKoa = axios.create({
+    baseURL:'http://localhost:8000'
+})
+
+serviceKoa.interceptors.request.use((config)=>{
+    config.data = Object.assign({},config.data,{
+        //authToken:window.localStorage.getItem('authToken')
+        authToken:'itisatoken'
+    })
+    return config
+})
+
+serviceKoa.interceptors.response.use((resp)=>{
+    if (resp.data.code === 200 ){
+        return resp.data.data
+    }else{
+        //全局处理错误
+        message.error(resp.data.errMsg)
+        console.log('network err:',resp)
+    }
+})
+
+
 export const getDashboardStatistic = () =>{
-    return service.post('/api/v1/dashboard')
+    return serviceKoa.post('/api/v1/dashboard')
 }
 
 export const getInventoryMaterialList = (offset = 0, limited = 10,keyword,sort) =>{
-    return service.post('/api/v1/material/list',{
+    return serviceKoa.post('/api/v1/material/list',{
         offset,
         limited,
         keyword,
