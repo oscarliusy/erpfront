@@ -68,13 +68,15 @@ export const getInventoryMaterialList = (offset = 0, limited = 10,keyword,sort) 
     })
 }
 
-export const postMaterialEdit = (params)=>{
-    return service.post('/api/v1/material/edit',params)
+export const getMaterialDetailById = (id) =>{
+    return serviceKoa.post(`/api/v1/material/detail/${id}`)
 }
 
-export const getMaterialDetailById = (id) =>{
-    return service.post(`/api/v1/material/detail/${id}`)
+export const postMaterialEdit = (params)=>{
+    return serviceKoa.post('/api/v1/material/edit',params)
 }
+
+
 
 export const postMaterialAdd = (params) =>{
     //console.log({params})
