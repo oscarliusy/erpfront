@@ -17,10 +17,10 @@ import {
     Icon
 } from 'antd'
 import axios from 'axios'
-import model from './model.jpg'
+//import model from './model.jpg'
 
 
-import {postMaterialAdd} from '../../requests'
+import {postMaterialAdd,getPurchaserList} from '../../requests'
 
 const formLayout = {
     labelCol:{
@@ -32,7 +32,7 @@ const formLayout = {
 }
 
 const { Option } = Select
-const purchaserList = ['FAN','LICH','BO','OSCAR']
+//const purchaserList = ['FAN','LICH','BO','OSCAR']
 
 @Form.create()
 class MaterialAdd extends Component {
@@ -41,13 +41,37 @@ class MaterialAdd extends Component {
         this.state={
             uniqueId:'',
             amount:0,
-            cost:0,
+            price:0,
             purchaser:'',
-            image:model,
-            desc:'',
+            //image:model,
+            image:'',
+            description:'',
             isSpin:false,
-            isUploading:false
+            isUploading:false,
+            purchaserList:[],
+            usersList:[],
+            userPurchase_id:''
         }
+    }
+
+    componentDidMount(){
+        this.initData()
+    }
+
+    initData = () =>{
+        getPurchaserList()
+        .then(resp=>{
+            let _purchaserList = resp.map(item=>{
+                return item.name
+            })
+            this.setState({
+                purchaserList:_purchaserList,
+                usersList:resp
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
     }
 
     handleSubmit = e =>{
@@ -56,12 +80,19 @@ class MaterialAdd extends Component {
             console.log({values})
           if (!err) {
             const params = Object.assign({},values,{
-                image:this.state.image
+                image:this.state.image,
+                userPurchase_id:this.state.userPurchase_id
             })
             postMaterialAdd(params)
             .then(resp=>{
-                message.success(resp.msg)
-                this.props.history.push('/erp/comm/material/list')
+                if(resp.type === 'success'){
+                    message.success(resp.msg)
+                    this.props.history.push('/erp/comm/material/list')
+                }else if(resp.type === 'error'){
+                    message.error(resp.msg)
+                }else{
+                    message.warning('未知错误')
+                }
             })
             .catch(err=>{
                 console.log(err)
@@ -75,9 +106,17 @@ class MaterialAdd extends Component {
     }
 
     handleSelectPurchaserChange = (value) =>{
-        //console.log(`selected ${value}`)
+        let _id = ''
+        for(let item of this.state.usersList){
+            if(item.name === value){
+                _id = item.id
+            }
+        }
         this.setState({
-            purchaser:value
+            purchaser:value,
+            userPurchase_id:_id
+        },()=>{
+            console.log(`selected ${value}`,this.state.userPurchase_id)
         })
     }
 
@@ -155,7 +194,7 @@ class MaterialAdd extends Component {
                     <Form.Item
                         label="详细信息"
                     >
-                        {getFieldDecorator('desc', {
+                        {getFieldDecorator('description', {
                             rules: [
                                 {
                                     required:true,
@@ -183,7 +222,7 @@ class MaterialAdd extends Component {
                                 onChange={this.handleSelectPurchaserChange}
                             >
                                 {
-                                    purchaserList.map(item=>{
+                                    this.state.purchaserList.map(item=>{
                                         return(
                                             <Option value={item} key={item}>{item}</Option>
                                         )
@@ -195,14 +234,14 @@ class MaterialAdd extends Component {
                     <Form.Item
                         label="采购价（￥）"
                     >
-                        {getFieldDecorator('cost', {
+                        {getFieldDecorator('price', {
                             rules: [
                                 {
                                     required:true,
                                     message:'采购价是必须填写的，默认为0'
                                 }
                             ],
-                            initialValue:this.state.cost
+                            initialValue:this.state.price
                             })(
                             <InputNumber min={0} step={0.01}/>
                         )}                        

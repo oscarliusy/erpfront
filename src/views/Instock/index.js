@@ -15,13 +15,13 @@ import {
 import { EditableTable } from '../../components'
 import { connect } from 'react-redux'
 import { saveInstockRowModify } from '../../actions/instockTable'
-import { instockMaterialSearch,instockMaterialPost } from '../../requests'
-import moment from 'moment'
+import { getPurchaserList,instockMaterialSearch,instockMaterialPost } from '../../requests'
+//import moment from 'moment'
 
 
 const { Search } = Input
 const { Option } = Select
-const instockerList = ['FAN','LICH','BO','OSCAR']
+//const instockerList = ['FAN','LICH','BO','OSCAR']
  
 const formLayout = {
     labelCol:{
@@ -35,7 +35,8 @@ const formLayout = {
 const titleDisplayMap = {
     uniqueId:'唯一识别码',
     amount: '库存数量',
-    desc:'详细信息'
+    description:'详细信息',
+    id:'ID'
 }
 
 const mapState = state =>{
@@ -68,7 +69,9 @@ class Instock extends Component {
             dataSource:[],
             instockSubmitDisabled:false,
             isSearchSpin:false,
-            isSubmitSpin:false
+            isSubmitSpin:false,
+            instockerList:[],
+            usersList:[]
         }
     }
 
@@ -101,19 +104,36 @@ class Instock extends Component {
         })
         if(instockErr) return {params,instockErr}
 
+        let _dataSourceSubmit = _dataSource.map(item=>{
+            return {
+                uniqueId:item.uniqueId,
+                instockAmount:parseInt(item.instockAmount)
+            }
+        })
+
+        let _userId = this.findUserId(values.instocker)
         params={
             code:values.instockCode,
-            desc:values.instockDesc,
-            createAt:moment(values.instockAt),
-            user:values.instocker,
+            description:values.instockDesc,
+            createAt:values.instockAt.format("x"),
+            userId:_userId,
             data:{
-                dataSource:_dataSource,
+                dataSource:_dataSourceSubmit,
                 count:_count
             }
         }
         return {params,instockErr}
     }
 
+    findUserId = (userName)=>{
+        let id = 0
+        for(let item of this.state.usersList){
+            if(item.name === userName){
+                id = item.id
+            }
+        }
+        return id
+    }
     handleSubmit = e => {  
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
@@ -123,10 +143,11 @@ class Instock extends Component {
                 message.error(instockErr)
             }else{
                 this.setState({isSubmitSpin:true})
-                console.log('submit parms:',params)
+                //console.log('submit parms:',params)
                 instockMaterialPost(params)          
                 .then(resp=>{
                     message.success(resp.msg)
+                    //this.props.history.push('/erp/comm/material/list')
                 })
                 .catch(err=>{
                     console.log(err)
@@ -145,8 +166,6 @@ class Instock extends Component {
     handleSelectPurchaserChange = (value) =>{
         console.log(`selected ${value}`)
     }
-
-
 
     rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
@@ -178,7 +197,7 @@ class Instock extends Component {
             if(item.key === this.state.selectedSearchRowKey){
                 item.uniqueId = this.state.selectedRowData[0].uniqueId
                 item.amount = this.state.selectedRowData[0].amount
-                item.desc = this.state.selectedRowData[0].desc
+                item.description = this.state.selectedRowData[0].description
             }
             return item
         })
@@ -236,7 +255,7 @@ class Instock extends Component {
             this.setState({
                 columns:colunms,
                 dataSource:resp.list,
-                total:resp.total
+                total:resp.totalInventory
             })
         })
         .catch(err=>{
@@ -249,10 +268,24 @@ class Instock extends Component {
 
 
     componentDidMount(){
+        this.initData()
         
     }
-    componentDidUpdate(){
 
+    initData = () =>{
+        getPurchaserList()
+        .then(resp=>{
+            let _instockerList = resp.map(item=>{
+                return item.name
+            })
+            this.setState({
+                instockerList:_instockerList,
+                usersList:resp
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
     }
     render() {
       const { getFieldDecorator } = this.props.form
@@ -320,13 +353,13 @@ class Instock extends Component {
                                 message:'入库人是必须填写的'
                             }
                         ],
-                        initialValue:instockerList[0]
+                        initialValue:this.state.instockerList[0]
                         })(
                             <Select 
                             style={{ width: 200 }} 
                         >
                             {
-                                instockerList.map(item=>{
+                                this.state.instockerList.map(item=>{
                                     return(
                                         <Option value={item} key={item}>{item}</Option>
                                     )

@@ -40,7 +40,7 @@ class EditableTable extends Component {
             },
             {
                 title:'详细信息',
-                dataIndex:'desc'
+                dataIndex:'description'
             },
             {
                 title:'操作',
@@ -79,7 +79,7 @@ class EditableTable extends Component {
             instockAmount:0,
             uniqueId:'uniqueId',
             amount:'amount',
-            desc:'description'
+            description:'description'
         }
         this.props.addEmptyRowToInstockTable({
             dataSource:[...dataSource,newData],

@@ -100,8 +100,11 @@ export default class IMList extends Component {
 
     getData = () =>{
         this.setState({isLoading:true})
+        console.log('offset',this.state.offset)
         getInventoryMaterialList(this.state.offset,this.state.limited,this.state.searchword,this.state.sort)
         .then(resp=>{
+            console.log('get',resp)
+            
             const columnsKeys = Object.keys(resp.list[0])
             columnsKeys.splice(0,1)//不在table中显示id
             const colunms = this.createColumns(columnsKeys)
@@ -159,7 +162,7 @@ export default class IMList extends Component {
         return (
             <Spin spinning={this.state.isLoading}>
                 <Card
-                    title={<span>当前库存：{this.state.totalInventory}</span>}
+                    title={<span>当前物料种类：{this.state.totalInventory}</span>}
                     bordered={false}
                     extra={
                         <Button onClick={this.toExcel}>导出当前页excel</Button>
