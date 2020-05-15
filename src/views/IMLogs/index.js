@@ -15,11 +15,10 @@ const { TabPane } = Tabs
 const titleDisplayMap = {
     id:'编号',
     uniqueId:'唯一识别码',
-    createAt:'时间',
+    c_time:'时间',
     user:'用户',
-    desc:'备注',
-    amount:'入库数量',
-    inventory:'入库前库存'
+    description:'备注',
+    amount:'入库数量'
 }
 
 export default class IMLogs extends Component {
@@ -90,7 +89,7 @@ export default class IMLogs extends Component {
         });
     }
 
-    renderDrawer = () => {
+    renderDrawer = () => {     
         this.setState({
             isLoadingDrawer:true
         })
@@ -154,6 +153,7 @@ export default class IMLogs extends Component {
         this.setState({
             isLoadingTab:true
         })
+        
         getMaterialInstockLogs(this.state.offsetTab1,this.state.limitedTab1)
         .then(resp=>{
             const {columns,dataSource} = this.buildColumnsDataSource(resp)

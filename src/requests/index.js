@@ -104,14 +104,14 @@ export const getMaterialEditLogs = (offset = 0, limited = 10) =>{
 }
 
 export const getMaterialInstockLogs = (offset = 0, limited = 10) =>{
-    return service.post('/api/v1/material/instocklog',{
+    return serviceKoa.post('/api/v1/material/instocklog',{
         offset,
         limited
     })
 }
 
 export const getInstockDetailById = (id,offset = 0, limited = 10) =>{
-    return service.post(`/api/v1/material/instock/${id}`,{
+    return serviceKoa.post(`/api/v1/material/instock/${id}`,{
         offset,
         limited
     })
