@@ -1,0 +1,17 @@
+.form-item-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+.form-item-wrap .form-item {
+  width: 600px;
+  display: flex;
+  justify-content: space-between;
+}
+.form-item-wrap .form-item .ant-form-item-label {
+  width: 200px;
+}
+.form-item-wrap .form-item .ant-form-item-control-wrapper {
+  width: 300px;
+}

@@ -118,7 +118,7 @@ export const getInstockDetailById = (id,offset = 0, limited = 10) =>{
 }
 
 export const getProductList = (keyword,offset=0,limited=10)=>{
-    return service.post('/api/v1/product/list',{
+    return serviceKoa.post('/api/v1/product/list',{
         keyword,
         offset,
         limited
@@ -126,22 +126,34 @@ export const getProductList = (keyword,offset=0,limited=10)=>{
 }
 
 export const getProductDetailById = (id) =>{
-    return service.post(`/api/v1/product/detail/${id}`)
+    return serviceKoa.post(`/api/v1/product/detail/${id}`)
 }
 
 export const saveProductEdit = (params)=>{
-    return service.post('/api/v1/product/edit',params)
+    return serviceKoa.post('/api/v1/product/edit',params)
+}
+
+export const getSiteMap = () =>{
+    return serviceKoa.post('/api/v1/product/siteMap')
 }
 
 export const postProductAdd = (params)=>{
-    return service.post('/api/v1/product/add',params)
+    return serviceKoa.post('/api/v1/product/add',params)
 }
 
 export const getPreoutstockList = (offset=0,limited=10) =>{
-    return service.post('/api/v1/preoutstock/list',{
+    return serviceKoa.post('/api/v1/product/preoutstock/list',{
         offset,
         limited
     })
+}
+
+export const copyPreoutstockById = (id) =>{
+    return serviceKoa.post(`/api/v1/product/preoutstock/copy/${id}`)
+}
+
+export const preToOutstockById = (id) =>{
+    return serviceKoa.post(`/api/v1/product/preoutstock/outstock/${id}`)
 }
 
 export const getPreoutstockById = (id) =>{

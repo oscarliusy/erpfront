@@ -18,7 +18,8 @@ import axios from 'axios'
 import { saveProductConstructTable,resetProductConstructTable } from '../../actions/productTable'
 import { connect } from 'react-redux'
 import { ProductEditTable } from '../../components'
-import { instockMaterialSearch,postProductAdd } from '../../requests'
+import { instockMaterialSearch,postProductAdd,getSiteMap } from '../../requests'
+import './productadd.less'
 
 const { Search } = Input
 
@@ -31,11 +32,11 @@ const formLayout = {
     }
 }
 const { Option } = Select
-const siteList = ['SLUS','SLCA','LKSUS','LKSCA','XSEU']
 const titleDisplayMap = {
+    id:'ID',
     uniqueId:'唯一识别码',
     amount: '库存数量',
-    desc:'详细信息'
+    description:'详细信息'
 }
 
 const mapState = (state) =>{
@@ -65,7 +66,10 @@ class ProductAdd extends Component {
             searchDataSource:[],
             drawerSubmitDisabled:false,
             selectedSearchRowKey:0,
-            selectedRowData:[]
+            selectedRowData:[],
+
+            siteList:[],
+            siteMap:[]
         }
     }
 
@@ -101,21 +105,43 @@ class ProductAdd extends Component {
         let productErr=''
         let params = {}
         let _materials =  [...this.props.materials]
+        //无物料
         if(_materials.length <= 0) {
             productErr = '无物料项'
             return {params,productErr}
         }
+
+        //填写错误
         _materials.map(item=>{
             if(item.amount === 0 || !Boolean(Number(item.amount)) || item.uniqueId === 'uniqueId'){
                 productErr='物料项填写有误，请检查'  
             }
             return item
         })
+
+        //物料查重
+        let _materialIds = _materials.map(item=>{
+            return item.id
+        })
+        let _materialSet = new Set(_materialIds)
+        if(_materialSet.size !== _materialIds.length){
+            productErr='物料项存在重复项'
+        }
+
+        let _site_id = 1
+        this.state.siteMap.forEach(item=>{
+            if(item.name === values.site){
+                _site_id = item.id
+            }
+        })
         if(productErr) return {params,productErr}
 
         params= Object.assign({},values)
         params.image = this.state.image
         params.materials = _materials
+        params.site_id = _site_id
+        //这里本应该从登录信息获取id,暂时伪造一个数据
+        params.creater_id = 1
         return {params,productErr}
     }
 
@@ -131,15 +157,22 @@ class ProductAdd extends Component {
                     this.setState({isSpin:true})
                     postProductAdd(params)          
                     .then(resp=>{
-                        message.success(resp.msg)
-                        this.props.resetProductConstructTable()
+                        if(resp.status === 'succeed'){
+                            message.success(resp.msg)
+                            this.props.resetProductConstructTable()
+                            setTimeout(()=>{
+                                this.props.history.push('/erp/comm/product/list')
+                            },1000)
+                        }
+                        else if(resp.status === 'failed'){
+                            message.warning(resp.msg)
+                        } 
                     })
                     .catch(err=>{
                         console.log(err)
                     })
                     .finally(()=>{
-                        this.setState({isSpin:false})      
-                        this.props.history.push('/erp/comm/product/list')
+                        this.setState({isSpin:false})        
                     })
                 }
               }else{
@@ -177,13 +210,13 @@ class ProductAdd extends Component {
         instockMaterialSearch(params)
         .then(resp=>{
             const columnsKeys = Object.keys(resp.list[0])
-            columnsKeys.splice(0,1)//不在table中显示id
+            //columnsKeys.splice(0,1)//不在table中显示id
             const colunms = this.createColumns(columnsKeys)
             if(!this.updater.isMounted(this)) return
             this.setState({
                 columns:colunms,
                 searchDataSource:resp.list,
-                total:resp.total
+                total:resp.totalInventory
             })
         })
         .catch(err=>{
@@ -233,7 +266,7 @@ class ProductAdd extends Component {
             if(item.key === this.state.selectedSearchRowKey){
                 item.uniqueId = this.state.selectedRowData[0].uniqueId
                 item.amount = 1
-                item.desc = this.state.selectedRowData[0].desc
+                item.id = this.state.selectedRowData[0].id
             }
             return item
         })
@@ -261,8 +294,22 @@ class ProductAdd extends Component {
         })
     }
 
+    initData = () =>{
+        getSiteMap().then(resp=>{
+            if(!this.updater.isMounted(this)) return
+            let _siteList = resp.map(item=>{
+                return item.name
+            })
+            this.setState({
+                siteList:_siteList,
+                siteMap:resp
+            })
+        })
+    }
+
     componentDidMount(){
         this.props.resetProductConstructTable()
+        this.initData()
     }
 
     render() {
@@ -287,13 +334,13 @@ class ProductAdd extends Component {
                                         message:'站点是必须填写的'
                                     }
                                 ],
-                                initialValue:siteList[0]
+                                initialValue:this.state.siteList[0]
                                 })(
                                     <Select 
                                     style={{ width: 200 }} 
                                 >
                                     {
-                                        siteList.map(item=>{
+                                        this.state.siteList.map(item=>{
                                             return(
                                                 <Option value={item} key={item}>{item}</Option>
                                             )
@@ -339,7 +386,7 @@ class ProductAdd extends Component {
                             )}                        
                         </Form.Item>
                         <Form.Item label="中文备注"  >
-                            {getFieldDecorator('desc', {
+                            {getFieldDecorator('description', {
                                 rules: [
                                     {
                                         required:true,
@@ -381,104 +428,106 @@ class ProductAdd extends Component {
                             />
                         </Form.Item>
                         <Divider orientation="left">选填项</Divider>
-                        <Form.Item label="Purchase Price(￥)">
+                        <div className ='form-item-wrap'>
+                        <Form.Item label="Purchase Price(￥)" className="form-item">
                             {getFieldDecorator('purchasePrice', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Weight(kg)">
+                        <Form.Item label="Weight(kg)" className="form-item">
                             {getFieldDecorator('weight', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.001} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Length(cm)">
+                        <Form.Item label="Length(cm)" className="form-item">
                             {getFieldDecorator('length', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Width(cm)">
+                        <Form.Item label="Width(cm)" className="form-item">
                             {getFieldDecorator('width', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Height(cm)">
+                        <Form.Item label="Height(cm)" className="form-item">
                             {getFieldDecorator('height', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="VolumeHeight(kg)">
+                        <Form.Item label="VolumeHeight(kg)" className="form-item">
                             {getFieldDecorator('volumeHeight', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.001} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Package Fee(￥)">
+                        <Form.Item label="Package Fee(￥)" className="form-item">
                             {getFieldDecorator('packageFee', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="OP Fee(￥)">
+                        <Form.Item label="OP Fee(￥)" className="form-item">
                             {getFieldDecorator('opFee', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Freight Fee($)">
+                        <Form.Item label="Freight Fee($)" className="form-item">
                             {getFieldDecorator('freightFee', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="FBA Fee($)">
-                            {getFieldDecorator('fbaFee', {
+                        <Form.Item label="FBA Fullfillment Fee($)" className="form-item">
+                            {getFieldDecorator('fbaFullfillmentFee', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Amazon Fee(%)">
-                            {getFieldDecorator('amazonFee', {
+                        <Form.Item label="Amazon Referral Fee(%)" className="form-item">
+                            {getFieldDecorator('amazonReferralFee', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Payoneer Fee(%)">
-                            {getFieldDecorator('payoneerFee', {
+                        <Form.Item label="Payoneer Service Fee(%)" className="form-item">
+                            {getFieldDecorator('payoneerServiceFee', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="AD Cost($)">
+                        <Form.Item label="AD Cost($)" className="form-item">
                             {getFieldDecorator('adcost', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
-                        <Form.Item label="Amazon Price($)">
-                            {getFieldDecorator('amazonPrice', {
+                        <Form.Item label="Amazon Sale Price($)" className="form-item">
+                            {getFieldDecorator('amazonSalePrice', {
                                 rules: [],                                
                                 })(
                                 <InputNumber min={0} step={0.01} placeholder={0}/>
                             )}                        
                         </Form.Item>
+                        </div>
                         <Form.Item wrapperCol={{ offset:4 }}>
                             <Button type="primary" htmlType="submit">
                             提交

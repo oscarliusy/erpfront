@@ -1,3 +1,7 @@
+/**
+ * 1.如果需要调整显示项目,主要修改server端的PRODUCTKEYS的顺序
+ * 以及下方splice的数量
+ */
 import React, { Component } from 'react'
 import { 
     Card,
@@ -7,6 +11,7 @@ import {
     Spin,
     Descriptions,
     Drawer,
+    message,
 } from 'antd'
 import { getProductList } from '../../requests'
 
@@ -18,7 +23,8 @@ const titleDisplayMap = {
     sku: 'SKU',
     childAsin:'(Child)ASIN',
     title:'Title',
-    image: 'Image'
+    image: 'Image',
+    description:'Description'
 }
 
 export default class ProductList extends Component {
@@ -51,7 +57,7 @@ export default class ProductList extends Component {
 
     showDrawer = () => {
         const keyArr = Object.keys(this.state.detail)
-        keyArr.splice(0,6)
+        keyArr.splice(0,7)
         keyArr.pop()
         this.setState({
             visible: true,
@@ -116,7 +122,7 @@ export default class ProductList extends Component {
         getProductList(this.state.searchword,this.state.offset,this.state.limited)
         .then(resp=>{
             //console.log(resp)
-            const columnsKeys = Object.keys(resp.list[0]).splice(0,6)
+            const columnsKeys = Object.keys(resp.list[0]).splice(0,7)
             const colunms = this.createColumns(columnsKeys)
             if(!this.updater.isMounted(this)) return
             this.setState({
@@ -130,6 +136,14 @@ export default class ProductList extends Component {
         })
         .finally(()=>{
             this.setState({isLoading:false})
+        })
+    }
+
+    onSearch = (value)=>{
+        this.setState({
+             searchword:value
+        },()=>{
+            this.getData()
         })
     }
 
@@ -160,13 +174,15 @@ export default class ProductList extends Component {
                             <Search
                                 placeholder="输入SKU/childASIN/Title/Description进行搜索"
                                 enterButton="Search"
-                                size="large"                        
+                                size="large"
+                                onSearch={value=>{this.onSearch(value)}}                         
                             />
                         </div>
                         <Table
                             rowKey={record=>record.id}
                             dataSource={this.state.dataSource}
                             columns={this.state.columns}
+                            size="small"
                             pagination={{
                                 total:this.state.total,
                                 onChange : this.onPageChange,
@@ -186,7 +202,7 @@ export default class ProductList extends Component {
                         width="800px"
                         destroyOnClose={true}
                     >
-                        <Descriptions title={this.state.detail.sku}  column={2} bordered>
+                        <Descriptions title={this.state.detail.sku}  column={2} bordered size="small">
                             {
                                 this.state.detailKeys.map(item=>{
                                     return(

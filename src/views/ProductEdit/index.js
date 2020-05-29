@@ -30,11 +30,11 @@ const formLayout = {
     }
 }
 const { Option } = Select
-const siteList = ['SLUS','SLCA','LKSUS','LKSCA','XSEU']
 const titleDisplayMap = {
+    id:'ID',
     uniqueId:'唯一识别码',
     amount: '库存数量',
-    desc:'详细信息'
+    description:'详细信息'
 }
 
 const mapState = (state) =>{
@@ -63,7 +63,10 @@ class ProductEdit extends Component {
             searchDataSource:[],
             drawerSubmitDisabled:false,
             selectedSearchRowKey:0,
-            selectedRowData:[]
+            selectedRowData:[],
+            siteList:[],
+            siteMap:[],
+            siteDefault:""
 
         }
     }
@@ -72,21 +75,40 @@ class ProductEdit extends Component {
         let productErr=''
         let params = {}
         let _materials =  [...this.props.materials]
+
+        //无物料
         if(_materials.length <= 0) {
             productErr = '无物料项'
             return {params,productErr}
         }
+        //填写错误
         _materials.map(item=>{
             if(item.amount === 0 || !Boolean(Number(item.amount)) || item.uniqueId === 'uniqueId'){
                 productErr='物料项填写有误，请检查'  
             }
             return item
         })
+        //物料查重
+        let _materialIds = _materials.map(item=>{
+            return item.id
+        })
+        let _materialSet = new Set(_materialIds)
+        if(_materialSet.size !== _materialIds.length){
+            productErr='物料项存在重复项'
+        }
+
         if(productErr) return {params,productErr}
+
+        let _site_id = 1
+        this.state.siteMap.forEach(item=>{
+            if(item.name === values.site){
+                _site_id = item.id
+            }
+        })
 
         params={
             id:values.id,
-            site:values.site,
+            site_id:_site_id,
             sku:values.sku,
             childAsin:values.childAsin,
             title:values.title,
@@ -108,7 +130,7 @@ class ProductEdit extends Component {
                     message.error(productErr)
                 }else{
                     this.setState({isSpin:true})
-                    //console.log('submit parms:',params)
+                    console.log('submit parms:',params)
                     saveProductEdit(params)          
                     .then(resp=>{
                         message.success(resp.msg)
@@ -146,6 +168,7 @@ class ProductEdit extends Component {
                     materials:_materials,
                     count:_materials.length+1
                 })
+                this.siteInfoInit()
             })
         })
         .catch(err=>{
@@ -155,6 +178,23 @@ class ProductEdit extends Component {
             this.setState({
                 isSpin:false
             })
+        })
+    }
+
+    siteInfoInit = ()=>{
+        let _siteList = this.state.dataSource.siteMap.map(item=>{
+            return item.name
+        })
+        let _siteDefault
+        this.state.dataSource.siteMap.forEach(item=>{
+            if(item.id === this.state.dataSource.site_id){
+                _siteDefault = item.name
+            }
+        })
+        this.setState({
+            siteList:_siteList,
+            siteMap:this.state.dataSource.siteMap,
+            siteDefault:_siteDefault
         })
     }
 
@@ -224,13 +264,13 @@ class ProductEdit extends Component {
         instockMaterialSearch(params)
         .then(resp=>{
             const columnsKeys = Object.keys(resp.list[0])
-            columnsKeys.splice(0,1)//不在table中显示id
+            //columnsKeys.splice(0,1)//不在table中显示id
             const colunms = this.createColumns(columnsKeys)
             if(!this.updater.isMounted(this)) return
             this.setState({
                 columns:colunms,
                 searchDataSource:resp.list,
-                total:resp.total
+                total:resp.totalInventory
             })
         })
         .catch(err=>{
@@ -255,11 +295,13 @@ class ProductEdit extends Component {
             visible: false
         })
         let _materials = [...this.props.materials]
+        //console.log('drawer materials',this.state.selectedRowData[0])
+        
         _materials =_materials.map(item=>{
             if(item.key === this.state.selectedSearchRowKey){
                 item.uniqueId = this.state.selectedRowData[0].uniqueId
                 item.amount = 1
-                item.desc = this.state.selectedRowData[0].desc
+                item.id = this.state.selectedRowData[0].id
             }
             return item
         })
@@ -345,13 +387,13 @@ class ProductEdit extends Component {
                                     message:'站点是必须填写的'
                                 }
                             ],
-                            initialValue:this.state.dataSource.site
+                            initialValue:this.state.siteDefault
                             })(
                                 <Select 
                                 style={{ width: 200 }} 
                             >
                                 {
-                                    siteList.map(item=>{
+                                    this.state.siteList.map(item=>{
                                         return(
                                             <Option value={item} key={item}>{item}</Option>
                                         )

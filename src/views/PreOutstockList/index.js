@@ -9,17 +9,17 @@ import {
     message
 } from 'antd'
 
-import { getPreoutstockList } from '../../requests'
+import { getPreoutstockList,copyPreoutstockById,preToOutstockById } from '../../requests'
 
 const titleDisplayMap = {
     id:'Id',
-    code:'Code',
-    createAt: '创建/修改时间',
-    desc:'详细信息',
+    pcode:'Code',
+    ptime: '创建/修改时间',
+    pdescription:'详细信息',
     user:'用户',
-    weight: '总重量(kg)',
-    volumn:'总体积(m³)',
-    cost:'运费(￥)'
+    total_weight: '总重量(kg)',
+    total_volume:'总体积(m³)',
+    total_freightfee:'总运费(¥)'
 }
 
 export default class PreOutstockList extends Component {
@@ -57,24 +57,38 @@ export default class PreOutstockList extends Component {
         })
     }
 
+    /**
+     * 1.拿到record.id
+     * 2.request.copyPreoutstock()发送复制请求
+     * 3.后台返回status:succeed || failed
+     *  3.1 成功: 重新请求list
+     *  3.2 失败: msg.warning
+     */
+    onCopyClick = async(record) => {
+        let resCopy = await copyPreoutstockById(record.id)
+        console.log(resCopy)
+        
+        if(resCopy.status === 'failed'){
+            message.warning(resCopy.msg)
+        }else if(resCopy.status === 'succeed'){
+            this.getData()
+            message.success(resCopy.msg)
+        }
+    }
     toEdit = (record) =>{
         this.props.history.push(`/erp/comm/product/preoutstock/edit/${record.id}`)
     }
 
-    toOutstock = (record) =>{
-        const _dataSource = [...this.state.dataSource]
-        _dataSource.map(item=>{
-            if(item.id === record.id){
-                item.hasOutstock = true
-            }
-            return item
-        })
-        //这里实际应当为一个网络请求，这里省略为一个状态管理。
-        this.setState({
-            dataSource:_dataSource
-        },()=>{
-            message.success('已成功出库')
-        })
+    /**
+     * 1.向后端发送预出库id
+     * 2.拿到返回值后
+     *   failed: 发出警告.
+     *   succeed:重新请求数据.
+     */
+    toOutstock = async(record) =>{
+        console.log(record.id)
+        
+        //let outRes = await preToOutstockById(record.id)
     }
 
     createColumns = (columnsKeys) =>{
@@ -92,16 +106,27 @@ export default class PreOutstockList extends Component {
             render:(text,record)=>{
               return (
                 <>
-                    <Button size="small" type="primary" onClick={this.onDetailClick.bind(this,record)}>详情</Button>
+                    <Button 
+                        size="small" 
+                        onClick={this.onCopyClick.bind(this,record)}
+                        style = {{marginRight:"10px"}} 
+                    >
+                        复制
+                    </Button>
+                    <Button size="small" type="primary" onClick={this.onDetailClick.bind(this,record)}>
+                        详情
+                    </Button>
                     <Button
                      size = "small" 
                      type = "link" 
                      style = {{marginLeft:"5px",marginRight:"5px"}} 
                      onClick = {this.toEdit.bind(this,record)}
-                     disabled = {record.hasOutstock}
-                    >编辑</Button>
+                     disabled = {record.has_out}
+                    >
+                        编辑
+                    </Button>
                     {
-                        record.hasOutstock 
+                        record.has_out 
                         ?
                         <span size="small" style={{color:"red"}} >已出库</span>
                         :
@@ -115,16 +140,27 @@ export default class PreOutstockList extends Component {
     }
 
     getData = () =>{
+        this.setState({
+            isLoading:true
+        })
         getPreoutstockList(this.state.offset,this.state.limited)
         .then(resp=>{
             const columnsKeys = Object.keys(resp.list[0])
-            columnsKeys.splice(1,1)//这里要把product去除，具体根据服务器决定如何处理。
+            columnsKeys.splice(columnsKeys.length-2,2)//这里要把product,has_out去除，具体根据服务器决定如何处理。
             const columns = this.createColumns(columnsKeys)
             if(!this.updater.isMounted(this)) return
             this.setState({
                 columns:columns,
                 dataSource:resp.list,
                 total:resp.total
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+        .finally(()=>{
+            this.setState({
+                isLoading:false
             })
         })
     }
