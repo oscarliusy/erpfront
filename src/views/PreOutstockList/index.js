@@ -86,9 +86,14 @@ export default class PreOutstockList extends Component {
      *   succeed:重新请求数据.
      */
     toOutstock = async(record) =>{
-        console.log(record.id)
-        
-        //let outRes = await preToOutstockById(record.id)
+        let outRes = await preToOutstockById(record.id)
+        if(outRes.status === 'failed'){
+            message.warning(outRes.msg)
+        }else if(outRes.status === 'succeed'){
+            this.getData()
+        }else{
+
+        }
     }
 
     createColumns = (columnsKeys) =>{

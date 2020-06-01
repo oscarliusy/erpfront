@@ -10,8 +10,7 @@ import {
     Input,
     Spin,
     Descriptions,
-    Drawer,
-    message,
+    Drawer
 } from 'antd'
 import { getProductList } from '../../requests'
 

@@ -10,9 +10,9 @@ import {
     Drawer,
     Table,
 } from 'antd'
-import moment from 'moment'
+//import moment from 'moment'
 
-import { getPreoutstockById,preoutstockProductSearch,postPreoutstockEdit } from '../../requests'
+import { getPreoutstockById,preoutstockProductSearch,postPreoutstockEdit,calcPreoutstock } from '../../requests'
 import { connect } from 'react-redux'
 import { savePreoutstockProductTable,resetPreoutstockProductTable} from '../../actions/preoutstockTable'
 import { PreoutstockEditTable } from '../../components'
@@ -33,11 +33,9 @@ const titleDisplayMap = {
     id:'id',
     sku:'SKU',
     title: 'Title',
-    desc:'Description',
+    description:'Description',
     site:'Site'
 }
-
-const userList = ['FAN','LICH','BO','OSCAR']
 
 const mapState = (state) =>{
     const { products } = state.preoutstockTable
@@ -64,39 +62,70 @@ class PreoutstockEdit extends Component {
             searchDataSource:[],
             drawerSubmitDisabled:false,
             selectedSearchRowKey:0,
-            selectedRowData:[]
+            selectedRowData:[],
+
+            usersList:[],
+            preoutstockerList:[],
+            preoutstocker:''
         }
     }
 
     formDataValidator = (values) =>{
-        let productErr=''
         let params = {}
-        let _products =  [...this.props.products]
-        if(_products.length <= 0) {
-            productErr = '无出库产品项'
-            return {params,productErr}
-        }
-        _products.map(item=>{
-            if(item.amount === 0 || !Boolean(Number(item.amount)) || item.sku === 'sku'){
-                productErr='出库产品项项填写有误，请检查'  
-            }
-            return item
-        })
+        const { productErr,_products} = this.productsDataValidator()
         if(productErr) return {params,productErr}
 
+        let _userId = this.findUserId(values.user)
         params={
             id:values.id,
-            desc:values.desc,
-            user:values.user,
+            pcode:values.pcode,
+            pdescription:values.pdescription,
+            user_id:_userId,
+            total_weight:this.state.dataSource.total_weight,
+            total_volume:this.state.dataSource.total_volume,
+            total_freightfee:this.state.dataSource.total_freightfee,
             products:_products
         }
         return {params,productErr}
     }
 
+    productsDataValidator = () =>{
+        let productErr=''
+        let _products =  [...this.props.products]
+        if(_products.length <= 0) {
+            productErr = '无出库产品项'
+        }
+        _products.forEach(item=>{
+            if(item.amount === 0 || !Boolean(Number(item.amount)) || item.sku === 'sku'){
+                productErr='出库产品项项填写有误，请检查'  
+            }
+        })
+        let _productsIds = _products.map(item=>{
+            return item.id
+        })
+        let _productsSet = new Set(_productsIds)
+        if(_productsSet.size !== _productsIds.length){
+            productErr='产品存在重复项'
+        }
+        return {
+            productErr,
+            _products
+        }
+    }
 
-    handleSubmit = e => {
+    findUserId = (userName)=>{
+        let id = 0
+        for(let item of this.state.usersList){
+            if(item.name === userName){
+                id = item.id
+            }
+        }
+        return id
+    }
+
+    handleSubmit = async(e) => {
         e.preventDefault();
-        this.props.form.validateFieldsAndScroll((err, values) => {
+        this.props.form.validateFieldsAndScroll(async(err, values) => {
             if (!err) {
                 const {params,productErr} = this.formDataValidator(values)
                 if(productErr){
@@ -104,18 +133,15 @@ class PreoutstockEdit extends Component {
                 }else{
                     this.setState({isSpin:true})
                     console.log('submit parms:',params)
-                    postPreoutstockEdit(params)          
-                    .then(resp=>{
-                        message.success(resp.msg)
+                    let editRes = await postPreoutstockEdit(params)   
+                    this.setState({isSpin:false})        
+                    if(editRes.status === 'succeed'){
+                        message.success(editRes.msg)
                         this.props.resetPreoutstockProductTable()
-                    })
-                    .catch(err=>{
-                        console.log(err)
-                    })
-                    .finally(()=>{
-                        this.setState({isSpin:false})      
                         this.props.history.push('/erp/comm/product/preoutstock/list')
-                    })
+                    }else if(editRes.status === 'failed'){
+                        message.warning(editRes.msg)
+                    }else{}
                 }
               }else{
                 message.error('请检查必填项和出库产品项是否填写正确')
@@ -123,6 +149,29 @@ class PreoutstockEdit extends Component {
         })
     }
 
+    calcPreoutstock = async() =>{
+        const { productErr,_products} = this.productsDataValidator()
+        //console.log(_products)
+        if(productErr){
+            message.warning(productErr)
+        }else{
+            let calcRes = await calcPreoutstock({products:_products})
+            //console.log(calcRes)
+            if(calcRes.status === 'succeed'){
+                let _dataSource = this.state.dataSource
+                let calcKeys = ['total_freightfee','total_volume','total_weight']
+                calcKeys.forEach(item=>{
+                   _dataSource[item] = calcRes.indexes[item].toFixed(3)
+                })
+                this.setState({
+                    dataSource:_dataSource
+                })
+                message.success(calcRes.msg)
+            }else{
+                message.warning(calcRes.msg)
+            }
+        }
+    }
     initData = () =>{
         this.setState({
             isSpin:true
@@ -142,6 +191,10 @@ class PreoutstockEdit extends Component {
                     products:_products,
                     count:_products.length+1
                 })
+
+                this.buildUserInfo()
+
+                
             })
         })
         .catch(err=>{
@@ -151,6 +204,25 @@ class PreoutstockEdit extends Component {
             this.setState({
                 isSpin:false
             })
+        })
+    }
+
+    buildUserInfo = () =>{
+        let _preoutstockerList = this.state.dataSource.usersList.map(item => {
+            return item.name
+        })
+
+        let _preoutstocker = ''
+        for(let item of this.state.dataSource.usersList){
+            if(item.id.toString() === this.state.dataSource.user_id.toString()){
+                _preoutstocker = item.name
+            }
+        }
+
+        this.setState({
+            preoutstocker:_preoutstocker,
+            preoutstockerList:_preoutstockerList,
+            usersList:this.state.dataSource.usersList
         })
     }
 
@@ -208,7 +280,7 @@ class PreoutstockEdit extends Component {
         preoutstockProductSearch(params)
         .then(resp=>{
             const columnsKeys = Object.keys(resp.list[0])
-            columnsKeys.splice(0,1)//不在table中显示id
+            //columnsKeys.splice(0,1)//还是留着id吧
             const colunms = this.createColumns(columnsKeys)
             if(!this.updater.isMounted(this)) return
             this.setState({
@@ -242,6 +314,7 @@ class PreoutstockEdit extends Component {
         _products =_products.map(item=>{
             if(item.key === this.state.selectedSearchRowKey){
                 item.sku = this.state.selectedRowData[0].sku
+                item.id = this.state.selectedRowData[0].id
                 item.amount = 1
             }
             return item
@@ -268,7 +341,7 @@ class PreoutstockEdit extends Component {
     }
 
     checkHasOutstock=()=>{
-        if(this.state.dataSource.hasOutstock){
+        if(this.state.dataSource.has_out){
             message.warning('已出库，禁止编辑')
             this.props.history.push('/erp/comm/product/preoutstock/list')
         }
@@ -309,15 +382,28 @@ class PreoutstockEdit extends Component {
                             <Input readOnly="readOnly" />
                         )}                        
                     </Form.Item>
-                    <Form.Item  label="Description">
-                        {getFieldDecorator('desc', {
+                    <Form.Item  label="Code" >
+                        {getFieldDecorator('pcode', {
                             rules: [
                                 {
                                     required:true,
-                                    message:'desc是必须填写的'
+                                    message:'code是必须填写的'
                                 }
                             ],
-                            initialValue:this.state.dataSource.desc
+                            initialValue:this.state.dataSource.pcode
+                            })(
+                            <Input />
+                        )}                        
+                    </Form.Item>
+                    <Form.Item  label="Description">
+                        {getFieldDecorator('pdescription', {
+                            rules: [
+                                {
+                                    required:true,
+                                    message:'description是必须填写的'
+                                }
+                            ],
+                            initialValue:this.state.dataSource.pdescription
                             })(
                             <Input />
                         )}                        
@@ -330,13 +416,13 @@ class PreoutstockEdit extends Component {
                                     message:'user是必须填写的'
                                 }
                             ],
-                            initialValue:userList[0]
+                            initialValue:this.state.preoutstocker
                             })(
                             <Select 
                                 style={{ width: 200 }} 
                             >
                                 {
-                                    userList.map(item=>{
+                                    this.state.preoutstockerList.map(item=>{
                                         return(
                                             <Option value={item} key={item}>{item}</Option>
                                         )
@@ -348,22 +434,23 @@ class PreoutstockEdit extends Component {
                     <Form.Item
                         label="创建（上次修改）时间"
                     >
-                        <span>{moment(this.state.dataSource.createAt).format('YYYY-MM-DD HH:mm:ss')}</span>        
+                        {/* <span>{moment(this.state.dataSource.ptime).format('YYYY-MM-DD HH:mm:ss')}</span>         */}
+                        <span>{this.state.dataSource.ptime}</span>
                     </Form.Item>
                     <Form.Item
                         label="总运费(￥)"
                     >
-                        <span>{this.state.dataSource.cost}</span>        
+                        <span>{this.state.dataSource.total_freightfee}</span>        
                     </Form.Item>
                     <Form.Item
                         label="总重量(kg)"
                     >
-                        <span>{this.state.dataSource.weight}</span>        
+                        <span>{this.state.dataSource.total_weight}</span>        
                     </Form.Item>
                     <Form.Item
                         label="总重量(m³)"
                     >
-                        <span>{this.state.dataSource.volumn}</span>        
+                        <span>{this.state.dataSource.total_volume}</span>        
                     </Form.Item>
                     <Form.Item lable="出库清单" wrapperCol={{ offset:4 }}>
                         <PreoutstockEditTable
@@ -375,6 +462,9 @@ class PreoutstockEdit extends Component {
                     <Form.Item wrapperCol={{ offset:4 }}>
                         <Button type="primary" htmlType="submit">
                            提交
+                        </Button>
+                        <Button  type="primary" style = {{marginLeft:"30px"}} onClick={this.calcPreoutstock}>
+                           参数计算
                         </Button>
                     </Form.Item>
                 </Form>

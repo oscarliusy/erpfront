@@ -157,22 +157,26 @@ export const preToOutstockById = (id) =>{
 }
 
 export const getPreoutstockById = (id) =>{
-    return service.post(`/api/v1/product/preoutstock/${id}`)
+    return serviceKoa.post(`/api/v1/product/preoutstock/detail/${id}`)
 }
 
 //params={keyword,offset,limited}
 export const preoutstockProductSearch = (params) =>{
-    return service.post('/api/v1/product/preoutstock/search',params)
+    return serviceKoa.post('/api/v1/product/preoutstock/search',params)
+}
+
+export const calcPreoutstock = (params)=>{
+    return serviceKoa.post('/api/v1/product/preoutstock/calc',params)
 }
 
 //params={id,desc,user,products}
 export const postPreoutstockEdit = (params) =>{
-    return service.post('/api/v1/product/preoutstock/edit',params)
+    return serviceKoa.post('/api/v1/product/preoutstock/edit',params)
 }
 
 //params={desc,user,products}
 export const postPreoutstockAdd = (params) =>{
-    return service.post('/api/v1/product/preoutstock/add',params)
+    return serviceKoa.post('/api/v1/product/preoutstock/add',params)
 }
 
 export const getProductEditLogs = (offset = 0, limited = 10) =>{

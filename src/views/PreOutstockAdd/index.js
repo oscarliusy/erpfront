@@ -10,7 +10,7 @@ import {
     Drawer,
     Table,
 } from 'antd'
-import { preoutstockProductSearch, postPreoutstockAdd } from '../../requests'
+import { preoutstockProductSearch, postPreoutstockAdd,calcPreoutstock,getPurchaserList } from '../../requests'
 import { connect } from 'react-redux'
 import { savePreoutstockProductTable,resetPreoutstockProductTable} from '../../actions/preoutstockTable'
 import { PreoutstockEditTable } from '../../components'
@@ -30,7 +30,7 @@ const titleDisplayMap = {
     id:'id',
     sku:'SKU',
     title: 'Title',
-    desc:'Description',
+    description:'Description',
     site:'Site'
 }
 
@@ -62,39 +62,97 @@ class PreOutstockAdd extends Component {
             searchDataSource:[],
             drawerSubmitDisabled:false,
             selectedSearchRowKey:0,
-            selectedRowData:[]
+            selectedRowData:[],
+
+            usersList:[],
+            preoutstockerList:[],
+
+            pcode:'',
+            pdescription:'',
+            total_freightfee:0,
+            total_weight:0,
+            total_volume:0,
         }
     }
 
     formDataValidator = (values) =>{
-        let productErr=''
         let params = {}
-        let _products =  [...this.props.products]
-        if(_products.length <= 0) {
-            productErr = '无出库产品项'
-            return {params,productErr}
-        }
-        _products.map(item=>{
-            if(item.amount === 0 || !Boolean(Number(item.amount)) || item.sku === 'sku'){
-                productErr='出库产品项项填写有误，请检查'  
-            }
-            return item
-        })
+        const { productErr,_products} = this.productsDataValidator()
         if(productErr) return {params,productErr}
 
+        let _userId = this.findUserId(values.user)
+        //这里user_id应该使用登录信息,暂时放个假数据
         params={
-            code:values.code,
-            desc:values.desc,
-            user:values.user,
+            pcode:values.pcode,
+            pdescription:values.pdescription,
+            user_id:_userId,
+            total_weight:this.state.total_weight,
+            total_volume:this.state.total_volume,
+            total_freightfee:this.state.total_freightfee,
+            has_out:0,
             products:_products
         }
         return {params,productErr}
     }
 
+    productsDataValidator = () =>{
+        let productErr=''
+        let _products =  [...this.props.products]
+        if(_products.length <= 0) {
+            productErr = '无出库产品项'
+        }
+        _products.forEach(item=>{
+            if(item.amount === 0 || !Boolean(Number(item.amount)) || item.sku === 'sku'){
+                productErr='出库产品项项填写有误，请检查'  
+            }
+        })
+        let _productsIds = _products.map(item=>{
+            return item.id
+        })
+        let _productsSet = new Set(_productsIds)
+        if(_productsSet.size !== _productsIds.length){
+            productErr='产品存在重复项'
+        }
+        return {
+            productErr,
+            _products
+        }
+    }
+
+    findUserId = (userName)=>{
+        let id = 0
+        for(let item of this.state.usersList){
+            if(item.name === userName){
+                id = item.id
+            }
+        }
+        return id
+    }
+
+    calcPreoutstock = async() =>{
+        const { productErr,_products} = this.productsDataValidator()
+        //console.log(_products)
+        if(productErr){
+            message.warning(productErr)
+        }else{
+            let calcRes = await calcPreoutstock({products:_products})
+            console.log(calcRes)
+            if(calcRes.status === 'succeed'){
+                this.setState({
+                    total_freightfee:calcRes.indexes.total_freightfee.toFixed(3),
+                    total_volume:calcRes.indexes.total_volume.toFixed(3),
+                    total_weight:calcRes.indexes.total_weight.toFixed(3)
+                })
+                message.success(calcRes.msg)
+            }else{
+                message.warning(calcRes.msg)
+            }
+        }
+    }
 
     handleSubmit = e => {
         e.preventDefault();
-        this.props.form.validateFieldsAndScroll((err, values) => {
+        this.props.form.validateFieldsAndScroll(async(err, values) => {
             if (!err) {
                 const {params,productErr} = this.formDataValidator(values)
                 if(productErr){
@@ -102,18 +160,15 @@ class PreOutstockAdd extends Component {
                 }else{
                     this.setState({isSpin:true})
                     console.log('submit parms:',params)
-                    postPreoutstockAdd(params)          
-                    .then(resp=>{
-                        message.success(resp.msg)
+                    let addRes = await postPreoutstockAdd(params)   
+                    this.setState({isSpin:false})        
+                    if(addRes.status === 'succeed'){
+                        message.success(addRes.msg)
                         this.props.resetPreoutstockProductTable()
-                    })
-                    .catch(err=>{
-                        console.log(err)
-                    })
-                    .finally(()=>{
-                        this.setState({isSpin:false})      
                         this.props.history.push('/erp/comm/product/preoutstock/list')
-                    })
+                    }else if(addRes.status === 'failed'){
+                        message.warning(addRes.msg)
+                    }else{}
                 }
               }else{
                 message.error('请检查必填项和出库产品项是否填写正确')
@@ -123,6 +178,18 @@ class PreOutstockAdd extends Component {
 
     initData = () =>{
         this.props.resetPreoutstockProductTable()
+        this.initUserList()
+    }
+
+    initUserList = async() =>{
+        let userRes = await getPurchaserList()
+        let _preoutstockerList = userRes.map(item=>{
+            return item.name
+        })
+        this.setState({
+            preoutstockerList:_preoutstockerList,
+            usersList:userRes
+        })
     }
 
     showDrawer = () => {
@@ -179,7 +246,7 @@ class PreOutstockAdd extends Component {
         preoutstockProductSearch(params)
         .then(resp=>{
             const columnsKeys = Object.keys(resp.list[0])
-            columnsKeys.splice(0,1)//不在table中显示id
+            //columnsKeys.splice(0,1)//不在table中显示id
             const colunms = this.createColumns(columnsKeys)
             if(!this.updater.isMounted(this)) return
             this.setState({
@@ -213,6 +280,7 @@ class PreOutstockAdd extends Component {
         _products =_products.map(item=>{
             if(item.key === this.state.selectedSearchRowKey){
                 item.sku = this.state.selectedRowData[0].sku
+                item.id = this.state.selectedRowData[0].id
                 item.amount = 1
             }
             return item
@@ -258,25 +326,27 @@ class PreOutstockAdd extends Component {
                     {...formLayout}
                 >
                     <Form.Item  label="Code">
-                        {getFieldDecorator('code', {
+                        {getFieldDecorator('pcode', {
                             rules: [
                                 {
                                     required:true,
                                     message:'code是必须填写的'
                                 }
                             ],
+                            initialValue:this.state.pcode
                             })(
                             <Input />
                         )}                        
                     </Form.Item>
                     <Form.Item  label="Description">
-                        {getFieldDecorator('desc', {
+                        {getFieldDecorator('pdescription', {
                             rules: [
                                 {
                                     required:true,
-                                    message:'desc是必须填写的'
+                                    message:'descrption是必须填写的'
                                 }
                             ],
+                            initialValue:this.state.pdescription
                             })(
                             <Input />
                         )}                        
@@ -289,7 +359,7 @@ class PreOutstockAdd extends Component {
                                     message:'user是必须填写的'
                                 }
                             ],
-                            initialValue:userList[0]
+                            initialValue:this.state.preoutstockerList[0]
                             })(
                             <Select 
                                 style={{ width: 200 }} 
@@ -307,17 +377,17 @@ class PreOutstockAdd extends Component {
                     <Form.Item
                         label="总运费(￥)"
                     >
-                        <span>0</span>        
+                        <span>{this.state.total_freightfee}</span>        
                     </Form.Item>
                     <Form.Item
                         label="总重量(kg)"
                     >
-                        <span>0</span>        
+                        <span>{this.state.total_weight}</span>        
                     </Form.Item>
                     <Form.Item
                         label="总重量(m³)"
                     >
-                        <span>0</span>        
+                        <span>{this.state.total_volume}</span>        
                     </Form.Item>
                     <Form.Item lable="出库清单" wrapperCol={{ offset:4 }}>
                         <PreoutstockEditTable
@@ -328,7 +398,10 @@ class PreOutstockAdd extends Component {
                     </Form.Item>
                     <Form.Item wrapperCol={{ offset:4 }}>
                         <Button type="primary" htmlType="submit">
-                           保存并计算
+                           提交表单
+                        </Button>
+                        <Button  type="primary" style = {{marginLeft:"30px"}} onClick={this.calcPreoutstock}>
+                           参数计算
                         </Button>
                     </Form.Item>
                 </Form>
