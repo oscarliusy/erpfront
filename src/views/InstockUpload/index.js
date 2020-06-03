@@ -88,6 +88,9 @@ class InstockUpload extends Component {
         if(this.state.sheetName !== 'instock'){
             message.warning('未使用入库模板,请检查')
             this.initTableData()
+            this.setState({
+                isUploadExcelSpin:false
+            })
             return
         }
         let _columns = []
@@ -235,16 +238,8 @@ class InstockUpload extends Component {
     formDataValidator = (values) =>{
         let instockErr=''
         let params = {}
-        if(!this.state.submitInstockList.length){
-            instockErr = '未添加入库EXCEL文件'
-            return {params,instockErr}
-        }
-
-        this.state.submitInstockList.forEach(item=>{
-            if(item.instockAmount === 0 || !Boolean(Number(item.instockAmount))){
-                instockErr='入库项数量有误，请检查'  
-            }
-        })
+        instockErr = this.excelDataValidator()
+        
         if(instockErr) return {params,instockErr}
 
         let _userId = this.findUserId(values.instocker)
@@ -258,6 +253,29 @@ class InstockUpload extends Component {
             }
         }
         return {params,instockErr}
+    }
+
+    excelDataValidator = () =>{
+        let instockErr = ''
+        if(!this.state.submitInstockList.length){
+            instockErr = '未添加入库EXCEL文件'
+            return instockErr
+        }
+
+        this.state.submitInstockList.forEach(item=>{
+            if(item.instockAmount === 0 || !Boolean(Number(item.instockAmount))){
+                instockErr='入库项数量有误，请检查'  
+            }
+        })
+
+        let _materialUniqueIds = this.state.submitInstockList.map(item=>{
+            return item.uniqueId
+        })
+        let _materialSet = new Set(_materialUniqueIds)
+        if(_materialSet.size !== _materialUniqueIds.length){
+            instockErr='入库物料中存在重复项'
+        }
+        return instockErr
     }
 
     findUserId = (userName)=>{

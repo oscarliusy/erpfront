@@ -90,6 +90,7 @@ export default class PreOutstockList extends Component {
         if(outRes.status === 'failed'){
             message.warning(outRes.msg)
         }else if(outRes.status === 'succeed'){
+            message.success(outRes.msg)
             this.getData()
         }else{
 

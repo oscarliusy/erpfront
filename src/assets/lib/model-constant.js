@@ -21,3 +21,18 @@ export const INSTOCK_KEYS = {
     type:'float'
   }
 }
+
+export const OUTSTOCK_KEYS = {
+  site:{
+    text:'站点',
+    type:'string'
+  },
+  sku:{
+    text:'sku',
+    type:'string'
+  },
+  amount:{
+    text:'出库数量',
+    type:'number'
+  }
+}

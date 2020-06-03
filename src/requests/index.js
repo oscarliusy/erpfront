@@ -169,12 +169,14 @@ export const calcPreoutstock = (params)=>{
     return serviceKoa.post('/api/v1/product/preoutstock/calc',params)
 }
 
-//params={id,desc,user,products}
 export const postPreoutstockEdit = (params) =>{
     return serviceKoa.post('/api/v1/product/preoutstock/edit',params)
 }
 
-//params={desc,user,products}
+export const postOutstockUpload = (params) =>{
+    return serviceKoa.post('/api/v1/product/outstock/upload',params)
+}
+
 export const postPreoutstockAdd = (params) =>{
     return serviceKoa.post('/api/v1/product/preoutstock/add',params)
 }
