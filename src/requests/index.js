@@ -204,22 +204,24 @@ export const getOutstockDetailById = (id,offset = 0, limited = 10) =>{
 }
 
 export const getSiteCurrency = () =>{
-    return service.post('/api/v1/currency/site')
+    return serviceKoa.post('/api/v1/currency/site')
 }
 
-export const modifySiteCurrency = (siteInfo) => {
-    return service.post('/api/v1/currency/sitemodify',{
-        siteInfo
+export const modifySiteCurrency = (params) => {
+    return serviceKoa.post('/api/v1/currency/sitemodify',{
+        site:params.site,
+        currency:params.currency
     })
 }
 
 export const getExchangeRate = () =>{
-    return service.post('/api/v1/currency/exchangerate')
+    return serviceKoa.post('/api/v1/currency/exchangerate')
 }
 
-export const setExchangeRate = (exchangeRate) =>{
-    return service.post('/api/v1/currency/setexchangerate',{
-        exchangeRate
+export const setExchangeRate = (params) =>{
+    return serviceKoa.post('/api/v1/currency/setexchangerate',{
+        currency:params.currency,
+        exchangeRate:params.exchangeRate
     })
 }
 

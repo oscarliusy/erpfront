@@ -46,9 +46,7 @@ class SiteCurrencyForm extends Component {
     }
 
     buildCurrencyList = () =>{
-        const originCurrencyList = this.props.siteInfo.map(item=>{
-            return item.currency
-        })
+        const originCurrencyList = Object.keys(this.props.exchangeRate)
         return this.uniq(originCurrencyList)
     }
 
@@ -105,7 +103,7 @@ class SiteCurrencyForm extends Component {
                                 message:'currency是必须填写的'
                             }
                         ],
-                        initialValue:this.state.currencyList[0]
+                        initialValue:this.props.siteInfo[0].currency
                         })(
                             <Select 
                             style={{ width: 200 }} 

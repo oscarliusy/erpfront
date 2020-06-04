@@ -53,7 +53,7 @@ class ExchangeRateForm extends Component {
 
     render() {
         const { getFieldDecorator } = this.props.form
-        console.log('props',this.props)
+        //console.log('props',this.props)
         return (
             <Form
                 onSubmit={this.handleSubmit}

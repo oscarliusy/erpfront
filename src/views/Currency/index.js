@@ -25,7 +25,7 @@ export default class Currency extends Component {
     }
 
     //values:{site: "SLUS", currency: "USD"}
-    setSiteCurrency = (values) =>{
+    setSiteCurrency = async(values) =>{
         let _siteInfo = [...this.state.siteInfo]
         _siteInfo.map(item=>{
             if(item.site === values.site){
@@ -37,26 +37,21 @@ export default class Currency extends Component {
         this.setState({
             isLoading:true
         })
+        let siteRes = await modifySiteCurrency(values)
+        if(siteRes.status === 'success'){
+            message.success(siteRes.msg)
+            this.setState({ isLoading:false })
+            this.initData()
+        }else if(siteRes.status === 'failed'){
+            message.warn(siteRes.msg)
+            this.setState({ isLoading:false })
+        }else{
 
-        modifySiteCurrency(_siteInfo)
-        .then(resp=>{
-            message.success(resp.msg)
-            this.setState({
-                siteInfo:_siteInfo
-            })
-        })
-        .catch(err=>{
-            console.log(err)
-        }) 
-        .finally(()=>{
-            this.setState({
-                isLoading:false
-            })
-        })   
+        }
     }
 
     //values: {currency: "USD", exchangeRate: 6.52}
-    setExchangeRate = (values)=>{
+    setExchangeRate = async(values)=>{
         let _exchangeRate = Object.assign({},this.state.exchangeRate)
         if(_exchangeRate[values.currency]){
             _exchangeRate[values.currency] = values.exchangeRate
@@ -65,22 +60,19 @@ export default class Currency extends Component {
         this.setState({
             isLoading:true
         })
-        
-        setExchangeRate(_exchangeRate)
-        .then(resp=>{
-            message.success(resp.msg)
-            this.setState({
-                exchangeRate:_exchangeRate
-            })
-        })
-        .catch(err=>{
-            console.log(err)
-        }) 
-        .finally(()=>{
-            this.setState({
-                isLoading:false
-            })
-        })   
+ 
+        let exRes = await setExchangeRate(values)
+        if(exRes.status === 'success'){
+            message.success(exRes.msg)
+            this.setState({ isLoading:false })
+            this.initData()
+        }else if(exRes.status === 'failed'){
+            message.warn(exRes.msg)
+            this.initData()
+            this.setState({ isLoading:false })
+        }else{
+
+        }
     }
 
     initData = () =>{
@@ -90,8 +82,8 @@ export default class Currency extends Component {
         ])
         .then(axios.spread((currencyResp,exchangeResp)=>{
             this.setState({
-                siteInfo:currencyResp,
-                exchangeRate:exchangeResp
+                siteInfo:currencyResp.list,
+                exchangeRate:exchangeResp.exchangeRate
             })
         }))
         .catch(err=>{
@@ -114,7 +106,7 @@ export default class Currency extends Component {
             <>
                 <Spin spinning={this.state.isLoading}>
                 <div className="site-statistic-demo-card">
-                    <Row justify="space-between" gutter="24">
+                    <Row justify="space-between" gutter={24}>
                         {
                             this.state.siteInfo.map((item,index)=>{
                                 return(
@@ -140,6 +132,7 @@ export default class Currency extends Component {
                 <div className="horizontal-form">
                     <SiteCurrencyForm 
                         siteInfo={this.state.siteInfo}
+                        exchangeRate = {this.state.exchangeRate}
                         setSiteCurrency={this.setSiteCurrency} 
                     />
                 </div>
