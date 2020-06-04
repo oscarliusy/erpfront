@@ -14,13 +14,17 @@ import { getProductEditLogs,getProductOutstockLogs,getOutstockDetailById } from 
 const { TabPane } = Tabs
 const titleDisplayMap = {
     id:'Id',
-    site:'站点',
-    createAt:'时间',
+    c_time:'时间',
     user:'用户',
     code:'编号',
+    description:'描述',
+    total_freightfee:'总运费(¥)',
+    total_volume:'总体积(m³)',
+    total_weight:'总重量(kg)',
+
     amount:'出库数量',
     sku:'SKU',
-
+    site:'站点'
 }
 
 
@@ -70,6 +74,7 @@ export default class ProductLogs extends Component {
     }
 
     toOutstockDetail = (record) =>{
+        console.log(record.id)
         this.setState({
             idDrawer:record.id
         })

@@ -189,14 +189,15 @@ export const getProductEditLogs = (offset = 0, limited = 10) =>{
 }
 
 export const getProductOutstockLogs = (offset = 0, limited = 10) =>{
-    return service.post('/api/v1/product/outstocklog',{
+    return serviceKoa.post('/api/v1/product/outstocklog',{
         offset,
         limited
     })
 }
 
 export const getOutstockDetailById = (id,offset = 0, limited = 10) =>{
-    return service.post(`/api/v1/product/outstock/${id}`,{
+    return serviceKoa.post('/api/v1/product/outstock/detail',{
+        id,
         offset,
         limited
     })

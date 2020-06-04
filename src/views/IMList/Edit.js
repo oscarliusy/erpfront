@@ -216,7 +216,7 @@ class Edit extends Component {
                             ],
                             initialValue:this.state.amount
                             })(
-                            <InputNumber min={0} />
+                            <InputNumber />
                         )}                        
                     </Form.Item>
                     <Form.Item
