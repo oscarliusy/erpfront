@@ -9,6 +9,7 @@ const commonProductMenu = commonRoutes.productRoutes.filter(route=>route.isNav =
 const userMenu = commonRoutes.userRoutes.filter(route=>route.isNav === true)
 const adminMenu = adminRoutes.filter(route=>route.isNav === true)
 
+//redux初始化后,从store中取出原先storage中的登录数据
 const mapState = state =>({
     isSignIn:state.user.isSignIn,
     role:state.user.role

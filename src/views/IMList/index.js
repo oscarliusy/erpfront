@@ -100,11 +100,8 @@ export default class IMList extends Component {
 
     getData = () =>{
         this.setState({isLoading:true})
-        console.log('offset',this.state.offset)
         getInventoryMaterialList(this.state.offset,this.state.limited,this.state.searchword,this.state.sort)
-        .then(resp=>{
-            console.log('get',resp)
-            
+        .then(resp=>{        
             const columnsKeys = Object.keys(resp.list[0])
             columnsKeys.splice(0,1)//不在table中显示id
             const colunms = this.createColumns(columnsKeys)

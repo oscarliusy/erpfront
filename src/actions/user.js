@@ -1,5 +1,4 @@
 import actionTypes from './actionTypes'
-import { signInRequest } from '../requests'
 
 const startSignIn = () =>{
     return {
@@ -16,13 +15,13 @@ const signInSuccess = (userInfo) =>{
     }
 }
 
-const signInFailed = () =>{
+const signInFailed = (msg) =>{
     window.localStorage.removeItem('authToken')
     window.sessionStorage.removeItem('authToken')
     window.localStorage.removeItem('userInfo')
     window.sessionStorage.removeItem('userInfo')
     return {
-        type:actionTypes.SIGNIN_FAILED
+        type:actionTypes.SIGNIN_FAILED,
     }
 }
 
@@ -35,25 +34,26 @@ export const signOut = ()=>{
 export const signIn = (signInInfo) =>{
     return dispatch => {
         dispatch(startSignIn)
-        signInRequest(signInInfo)
-            .then(resp=>{
-                if(resp.data.code === 200){
-                    const {
-                        authToken,
-                        ...userInfo
-                    } = resp.data.data
-                    if(signInInfo.remember === true){
-                        window.localStorage.setItem('authToken',authToken)
-                        window.localStorage.setItem('userInfo',JSON.stringify(userInfo))
-                    }else{
-                        window.sessionStorage.setItem('authToken',authToken)
-                        window.sessionStorage.setItem('userInfo',JSON.stringify(userInfo))
-                    }
-                    dispatch(signInSuccess(resp.data.data))
-                }else{
-                    dispatch(signInFailed())
-                }
-            })
+        const {
+            authToken,
+            userInfo,
+            remember,
+            status
+        } = signInInfo
+        if(status === 'succeed'){
+            if(remember === true){
+                window.localStorage.setItem('authToken',authToken)
+                window.localStorage.setItem('userInfo',JSON.stringify(userInfo))
+            }else{
+                window.sessionStorage.setItem('authToken',authToken)
+                window.sessionStorage.setItem('userInfo',JSON.stringify(userInfo))
+            }
+            dispatch(signInSuccess(userInfo))
+        }else if(status === 'failed'){
+            dispatch(signInFailed())
+        }else{
+
+        }
     }
 }
 

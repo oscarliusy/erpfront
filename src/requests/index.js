@@ -1,5 +1,9 @@
 import axios from 'axios'
 import {message} from 'antd'
+
+// import store from '../store'
+// const state = store.getState()
+
 //import io from 'socket.io-client'
 
 //export const socket = io('http://localhost:4000')
@@ -10,19 +14,20 @@ const service = axios.create({
     baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/245040' : ''
 })
 
-const serviceNoauth = axios.create({
-    baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/245040' : ''
-})
 
 service.interceptors.request.use((config)=>{
-    config.data = Object.assign({},config.data,{
-        //authToken:window.localStorage.getItem('authToken')
-        authToken:'itisatoken'
-    })
+    // config.data = Object.assign({},config.data,{
+    //     //authToken:window.localStorage.getItem('authToken')
+    //     authToken:'itisatoken'
+    // })
+    const token = localStorage.getItem('authToken')
+    console.log(token)
+    config.headers.Authorization = `Bearer ${token}`
     return config
 })
 
 service.interceptors.response.use((resp)=>{
+    console.log(resp)
     if (resp.data.code === 200 ){
         return resp.data.data
     }else{
@@ -36,23 +41,42 @@ const serviceKoa = axios.create({
     baseURL:'http://localhost:8000'
 })
 
-serviceKoa.interceptors.request.use((config)=>{
-    config.data = Object.assign({},config.data,{
-        //authToken:window.localStorage.getItem('authToken')
-        authToken:'itisatoken'
-    })
+serviceKoa.interceptors.request.use(
+    (config)=>{
+    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
+    config.headers.Authorization = `Bearer ${token}`
     return config
-})
+    },
+    err =>{
+     return Promise.reject(err)   
+    })
 
-serviceKoa.interceptors.response.use((resp)=>{
-    if (resp.data.code === 200 ){
-        return resp.data.data
-    }else{
-        //全局处理错误
-        message.error(resp.data.errMsg)
-        console.log('network err:',resp)
+serviceKoa.interceptors.response.use(
+    resp => {
+        if (resp.data.code === 200 ){
+            return resp.data.data
+        }else{
+            //全局处理错误
+            message.error(resp.data.errMsg)
+            console.log('network err:',resp)
+        }
+    },
+    error =>{
+        if (error.response) {
+            switch (error.response.status) {
+                case 401:
+                    message.warning('登录信息已过期,请重新登录')
+                    // store.dispatch({
+                    //     type:'SIGNIN_FAILED'
+                    // })
+                    break
+                default:
+                    console.log('default error')
+            }
+        }
+        return Promise.reject(error.response)
     }
-})
+)
 
 
 export const getDashboardStatistic = () =>{
@@ -254,9 +278,9 @@ export const profileEditPost = (params) =>{
 
 //signInInfo = { email, password}
 export const signInRequest = (signInInfo) =>{
-    return serviceNoauth.post('/api/v1/signin',{
+    return serviceKoa.post('/api/v1/signin',{
         email:signInInfo.email,
-        password:signInInfo.email
+        password:signInInfo.password
     })
 }
 
