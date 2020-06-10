@@ -15,7 +15,7 @@ import {
 import axios from 'axios'
 import { connect } from 'react-redux'
 import { profileEditPost } from '../../requests'
-import { changeAvatar,changeUsername } from '../../actions/user'
+import { changeAvatar,changeUsername,signOut } from '../../actions/user'
 
 const formLayout = {
     labelCol:{
@@ -28,17 +28,20 @@ const formLayout = {
 
 const mapState = (state) =>({
     username:state.user.username,
-    avatar:state.user.avatar
+    avatar:state.user.avatar,
+    email:state.user.email
 })
 
-@connect(mapState,{changeAvatar,changeUsername})
+@connect(mapState,{changeAvatar,changeUsername,signOut})
 @Form.create()
 class Profile extends Component {
     constructor(){
         super()
         this.state = {
-            isLoading:false
-            
+            isLoading:false,
+            new_password:"",
+            new_email:"",
+            new_username:""
         }
     }
 
@@ -69,40 +72,46 @@ class Profile extends Component {
     }
 
     formDataValidator = (values) =>{
-        let addAccountErr=''
-        let params = Object.assign({},values)
-        //这里增加验证内容
-        return {params,addAccountErr}
+        let editAccountErr=''
+        if(!values.new_email && !values.new_username && !values.new_password) editAccountErr = '请填写需要修改的项目'
+        const params = {
+            email:this.props.email,
+            new_email:values.new_email.trim() || this.props.email,
+            new_username:values.new_username.trim() || this.props.username,
+            password:values.password.trim(),
+            new_password:values.new_password.trim()
+        }
+        
+        return {params,editAccountErr}
     }
 
     handleSubmit = e => {
-        this.setState({
-            isLoading:true
-        })
+        this.setState({isLoading:true})
         e.preventDefault()
-        this.props.form.validateFieldsAndScroll((err, values) => {
+        this.props.form.validateFieldsAndScroll(async(err, values) => {
             if (!err) {
-                const {params,addAccountErr} = this.formDataValidator(values)
-                if(addAccountErr){
-                    message.error(addAccountErr)
+                const {params,editAccountErr} = this.formDataValidator(values)
+                if(editAccountErr){
+                    message.error(editAccountErr)
+                    this.setState({isLoading:false})
                 }else{
                     //console.log('submit parms:',params)
-                    profileEditPost(params)          
-                    .then(resp=>{
-                        message.success(resp.msg)
-                        this.setState({isLoading:false})  
-                        this.props.changeUsername(params.username)                      
-                    })
-                    .catch(err=>{
-                        console.log(err)
-                    })
-                    .finally(()=>{
-                        
-                    })
+                    let editRes = await profileEditPost(params)  
+                    if(editRes.status === 'succeed'){
+                        message.success(editRes.msg)
+                        this.setState({isLoading:false}) 
+                        //重新登录的好处是不需要处理token和storage,登录一并处理好了
+                        //this.props.changeUsername(params.new_username,params.new_email) 
+                        this.props.signOut()
+                    }else{
+                        message.warning(editRes.msg)
+                        this.setState({isLoading:false})
+                    }
                 }
-              }else{
+            }else{
                 message.error('请检查表单是否填写正确')
-              }
+                this.setState({isLoading:false})
+            }
         })
     }
 
@@ -112,7 +121,7 @@ class Profile extends Component {
             <>
                 <Spin spinning={this.state.isLoading}>
                     <Card
-                        title='新用户注册'
+                        title='个人登录信息设置'
                         bordered={false}
                         extra={<Button onClick={this.props.history.goBack}>退出</Button>} 
                     >
@@ -123,20 +132,8 @@ class Profile extends Component {
                             >
                                 <Row>
                                     <Col span={16} >
-                                        <Form.Item label="修改用户名" >
-                                            {getFieldDecorator('username', {
-                                                rules: [
-                                                    {
-                                                        required:true,
-                                                        message:'username是必须填写的'
-                                                    }
-                                                ],
-                                                initialValue:this.props.username
-                                                })(
-                                                <Input />
-                                            )}                        
-                                        </Form.Item>
-                                        <Form.Item label="修改登录密码" >
+                                        
+                                        <Form.Item label="登录密码" >
                                             {getFieldDecorator('password', {
                                                 rules: [
                                                     {
@@ -145,16 +142,45 @@ class Profile extends Component {
                                                     }
                                                 ],
                                                 })(
-                                                <Input placeholder="******"/>
+                                                <Input.Password placeholder="input password"/>
                                             )}                        
                                         </Form.Item>
-                                        <Form.Item label="更换头像" >                        
+                                        <Form.Item label="新的密码(不改勿填)" >
+                                            {getFieldDecorator('new_password', {
+                                                rules: [
+                                                ],
+                                                initialValue:this.state.new_password
+                                                })(
+                                                <Input.Password placeholder="input new password"/>
+                                            )}                        
+                                        </Form.Item>
+                                        <Form.Item label="新的用户名(不改勿填)" >
+                                            {getFieldDecorator('new_username', {
+                                                initialValue:this.state.new_username
+                                                })(
+                                                <Input />
+                                            )}                        
+                                        </Form.Item>
+                                        <Form.Item label="新的登录邮箱(不改勿填)" >
+                                            {getFieldDecorator('new_email', {
+                                                rules: [
+                                                    {
+                                                        type: 'email',
+                                                        message: 'The input is not valid E-mail!',
+                                                    },
+                                                ],
+                                                initialValue:this.state.new_email
+                                                })(
+                                                <Input />
+                                            )}                        
+                                        </Form.Item>
+                                        <Form.Item label="更换头像(暂不支持)" >                        
                                             <Upload  
                                                 showUploadList={false}
                                                 customRequest={this.handleUploadImage}
                                             >
                                                 <div>
-                                                    <Button>
+                                                    <Button disabled>
                                                         <Icon type="upload" /> Click to upload
                                                     </Button>
                                                 </div>
@@ -169,10 +195,13 @@ class Profile extends Component {
                                     /> 
                                     </Col>
                                 </Row>
-                                <Form.Item wrapperCol={{ offset:4 }}>
-                                    <Button type="primary" htmlType="submit">
-                                        提交
-                                    </Button>
+                                <Form.Item wrapperCol={{ offset:3 }}>
+                                    <div>
+                                        <Button type="primary" htmlType="submit">
+                                            提交
+                                        </Button>
+                                        <span>(提交后请重新登录)</span>
+                                    </div>
                                 </Form.Item>
                             </Form>
                         </div>

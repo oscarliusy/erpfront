@@ -66,11 +66,12 @@ export const changeAvatar = (avatarUrl)  =>{
     }
 }
 
-export const changeUsername = (username)  =>{
+export const changeUsername = (username,email)  =>{
     return {
         type: actionTypes.CHANGE_USERNAME,
         payload:{
-            username
+            username,
+            email
         }
     }
 }

@@ -273,7 +273,7 @@ export const postSignUp = (params) =>{
 
 //params = { id,username,password,avatar}
 export const profileEditPost = (params) =>{
-    return service.post('/api/v1/account/profile',{params})
+    return serviceKoa.post('/api/v1/account/editprofile',params)
 }
 
 //signInInfo = { email, password}

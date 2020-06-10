@@ -38,6 +38,7 @@ export default (state = initState,action) =>{
             return{
                 ...state,
                 username:action.payload.username,
+                email:action.payload.email
             }
         default:
             return state
