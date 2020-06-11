@@ -147,7 +147,7 @@ class Instock extends Component {
                 instockMaterialPost(params)          
                 .then(resp=>{
                     message.success(resp.msg)
-                    //this.props.history.push('/erp/comm/material/list')
+                    this.props.history.push('/erp/comm/material/list')
                 })
                 .catch(err=>{
                     console.log(err)

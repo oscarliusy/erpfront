@@ -8,7 +8,7 @@ import {
     Card
  } from 'antd'
 import './productlogs.less'
-import moment from 'moment'
+import { timeStamp2date } from '../../assets/lib/utils'
 import { getProductEditLogs,getProductOutstockLogs,getOutstockDetailById } from '../../requests'
 
 const { TabPane } = Tabs
@@ -151,7 +151,10 @@ export default class ProductLogs extends Component {
         const columnsKeys = Object.keys(resp.list[0])
         const columns = this.createColumns(columnsKeys,this.state.currentTab)
         const dataSource = resp.list.map(item=>{
-            if(item.createAt) item.createAt = moment(item.createAt).format('YYYY-MM-DD HH:mm:ss')
+            if(item.c_time){
+                let dateFormat = timeStamp2date(item.c_time)
+                item.c_time = dateFormat
+            }
             return item
         })
         return {columns,dataSource}

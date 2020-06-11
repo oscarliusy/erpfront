@@ -13,6 +13,7 @@ import {
     Drawer
 } from 'antd'
 import { getProductList } from '../../requests'
+import { timeStamp2date } from '../../assets/lib/utils'
 
 const { Search } = Input
 
@@ -74,6 +75,9 @@ export default class ProductList extends Component {
         const itemKey = Object.values(item)[0]
         if(itemKey==='materials'){
             return
+        }
+        if(itemKey === 'c_time'){
+            return timeStamp2date(this.state.detail[itemKey])
         }
         return this.state.detail[itemKey]
     }

@@ -10,6 +10,7 @@ import {
 } from 'antd'
 
 import { getPreoutstockList,copyPreoutstockById,preToOutstockById } from '../../requests'
+import { timeStamp2date } from '../../assets/lib/utils'
 
 const titleDisplayMap = {
     id:'Id',
@@ -145,6 +146,17 @@ export default class PreOutstockList extends Component {
         return columns
     }
 
+    buildColumnsDataSource = (resp)=>{
+        const dataSource = resp.list.map(item=>{
+            if(item.ptime){
+                let dateFormat = timeStamp2date(item.ptime)
+                item.ptime = dateFormat
+            }
+            return item
+        })
+        return dataSource
+    }
+
     getData = () =>{
         this.setState({
             isLoading:true
@@ -154,10 +166,11 @@ export default class PreOutstockList extends Component {
             const columnsKeys = Object.keys(resp.list[0])
             columnsKeys.splice(columnsKeys.length-2,2)//这里要把product,has_out去除，具体根据服务器决定如何处理。
             const columns = this.createColumns(columnsKeys)
+            const dataSource = this.buildColumnsDataSource(resp)
             if(!this.updater.isMounted(this)) return
             this.setState({
                 columns:columns,
-                dataSource:resp.list,
+                dataSource:dataSource,
                 total:resp.total
             })
         })
