@@ -24,7 +24,10 @@ const titleDisplayMap = {
 
     amount:'出库数量',
     sku:'SKU',
-    site:'站点'
+    site:'站点',
+
+    createAt:'时间',
+    action:'操作内容'
 }
 
 
@@ -154,6 +157,10 @@ export default class ProductLogs extends Component {
             if(item.c_time){
                 let dateFormat = timeStamp2date(item.c_time)
                 item.c_time = dateFormat
+            }
+            if(item.createAt){
+                let dateFormat2 = timeStamp2date(item.createAt)
+                item.createAt = dateFormat2
             }
             return item
         })

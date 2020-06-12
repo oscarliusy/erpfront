@@ -13,7 +13,7 @@ const titleDisplayMap = {
     site:'站点',
     createAt:'时间',
     user:'用户',
-    action:'操作',
+    action:'操作内容',
     userAdmin:'管理员',
     currency:'币种' 
 

@@ -18,7 +18,9 @@ const titleDisplayMap = {
     c_time:'时间',
     user:'用户',
     description:'备注',
-    amount:'入库数量'
+    amount:'入库数量',
+    createAt:'时间',
+    action:'操作内容'
 }
 
 export default class IMLogs extends Component {
@@ -146,6 +148,10 @@ export default class IMLogs extends Component {
             if(item.c_time){
                 let dateFormat = timeStamp2date(item.c_time)
                 item.c_time = dateFormat
+            }
+            if(item.createAt){
+                let dateFormat2 = timeStamp2date(item.createAt)
+                item.createAt = dateFormat2
             }
             return item
         })

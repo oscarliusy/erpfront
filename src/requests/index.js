@@ -121,7 +121,7 @@ export const instockMaterialPost = (params) =>{
 }
 
 export const getMaterialEditLogs = (offset = 0, limited = 10) =>{
-    return service.post('/api/v1/material/editlog',{
+    return serviceKoa.post('/api/v1/material/editlog',{
         offset,
         limited
     })
@@ -206,7 +206,7 @@ export const postPreoutstockAdd = (params) =>{
 }
 
 export const getProductEditLogs = (offset = 0, limited = 10) =>{
-    return service.post('/api/v1/product/editlog',{
+    return serviceKoa.post('/api/v1/product/editlog',{
         offset,
         limited
     })
@@ -285,7 +285,7 @@ export const signInRequest = (signInInfo) =>{
 }
 
 export const getAccountCurrencyLogs = (offset = 0, limited = 10) =>{
-    return service.post('/api/v1/account/logs/currency',{
+    return serviceKoa.post('/api/v1/currency/editlog',{
         offset,
         limited
     })
