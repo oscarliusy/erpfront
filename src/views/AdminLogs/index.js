@@ -69,7 +69,7 @@ export default class AdminLogs extends Component {
         const columnsKeys = Object.keys(resp.list[0])
         const columns = this.createColumns(columnsKeys,this.state.currentTab)
         const dataSource = resp.list.map(item=>{
-            if(item.createAt) item.createAt = moment(item.createAt).format('YYYY-MM-DD HH:mm:ss')
+            if(item.createAt) item.createAt = moment(Number(item.createAt)).format('YYYY-MM-DD HH:mm:ss')
             return item
         })
         return {columns,dataSource}
