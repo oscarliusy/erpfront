@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom'
 import { signIn } from '../../actions/user'
 import { connect } from 'react-redux'
 import './signin.less'
-import { signInRequest } from '../../requests'
+import { signInRequest,checkStatus } from '../../requests'
 
 //从redux获取user.state和相关的action函数
 const mapState = (state)=>({
@@ -35,6 +35,12 @@ class SignIn extends Component {
             params,
             signInErr
         }
+    }
+
+    checkGetStatus = async(e) =>{
+        e.preventDefault()
+        let status = await checkStatus()
+        console.log('staus:',status)
     }
 
     handleSubmit = (e) => {
@@ -119,6 +125,11 @@ class SignIn extends Component {
                         })(<Checkbox disabled={this.state.isLoading}>记住我</Checkbox>)}
                         <Button loading={this.state.isLoading} type="primary" htmlType="submit" className="login-form-button">
                             登录
+                        </Button>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" className="login-form-button" onClick={this.checkGetStatus}>
+                            测试通信
                         </Button>
                     </Form.Item>
                 </Form>

@@ -297,3 +297,7 @@ export const getAccountManageLogs = (offset = 0, limited = 10) =>{
         limited
     })
 }
+
+export const checkStatus = () =>{
+    return serviceKoa.get('/api/v1/checkstatus/env')
+}
