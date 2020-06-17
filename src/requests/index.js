@@ -38,7 +38,7 @@ service.interceptors.response.use((resp)=>{
 })
 
 const serviceKoa = axios.create({
-    baseURL:'http://localhost:8000'
+    baseURL: isDev ? 'http://localhost:8000' : 'http://localhost:80'
 })
 
 serviceKoa.interceptors.request.use(
