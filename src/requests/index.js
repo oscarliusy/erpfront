@@ -1,11 +1,8 @@
 import axios from 'axios'
 import {message} from 'antd'
-
-// import store from '../store'
-// const state = store.getState()
+import { PROJECT_CONFIG } from '../config'
 
 //import io from 'socket.io-client'
-
 //export const socket = io('http://localhost:4000')
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -16,10 +13,6 @@ const service = axios.create({
 
 
 service.interceptors.request.use((config)=>{
-    // config.data = Object.assign({},config.data,{
-    //     //authToken:window.localStorage.getItem('authToken')
-    //     authToken:'itisatoken'
-    // })
     const token = localStorage.getItem('authToken')
     console.log(token)
     config.headers.Authorization = `Bearer ${token}`
@@ -38,7 +31,7 @@ service.interceptors.response.use((resp)=>{
 })
 
 const serviceKoa = axios.create({
-    baseURL: isDev ? 'http://localhost:8000' : 'http://localhost:80'
+    baseURL:PROJECT_CONFIG[`${process.env.NODE_ENV}`]['baseURL']
 })
 
 serviceKoa.interceptors.request.use(
@@ -66,9 +59,6 @@ serviceKoa.interceptors.response.use(
             switch (error.response.status) {
                 case 401:
                     message.warning('登录信息已过期,请重新登录')
-                    // store.dispatch({
-                    //     type:'SIGNIN_FAILED'
-                    // })
                     break
                 default:
                     console.log('default error')
