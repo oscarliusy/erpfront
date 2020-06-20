@@ -8,13 +8,12 @@ import { PROJECT_CONFIG } from '../config'
 const isDev = process.env.NODE_ENV === 'development'
 
 const service = axios.create({
-    baseURL: isDev ? 'http://rap2api.taobao.org/app/mock/245040' : ''
+    baseURL: 'http://rap2api.taobao.org/app/mock/245040'
 })
 
 
 service.interceptors.request.use((config)=>{
     const token = localStorage.getItem('authToken')
-    console.log(token)
     config.headers.Authorization = `Bearer ${token}`
     return config
 })
