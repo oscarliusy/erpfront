@@ -4,12 +4,10 @@ import {
   Table,
   Button,
   Spin,
-  Descriptions,
-  Drawer,
-  message,
   Tag
 } from 'antd'
 import { timeStamp2date } from '../../assets/lib/utils'
+import { getCrawlerTaskList } from '../../requests/crawler'
 
 const tasks = [{
   _id:'11111',
@@ -19,7 +17,7 @@ const tasks = [{
   finishedAt:1594003940450,
   createdBy:'oscar',
   status:'Finish',
-  searchList:[{
+  detail:[{
     KEYWORD:'Seal Bottle',
     total:240
   },{
@@ -34,7 +32,7 @@ const tasks = [{
   finishedAt:0,
   createdBy:'wangbo',
   status:'Ongoing',
-  searchList:[{
+  detail:[{
     KEYWORD:'Paddle'
   },{
     KEYWORD:'Chair'
@@ -47,7 +45,7 @@ const tasks = [{
   finishedAt:0,
   createdBy:'wangbo',
   status:'Error',
-  searchList:[{
+  detail:[{
     KEYWORD:'Book'
   },{
     KEYWORD:'Coat'
@@ -115,6 +113,15 @@ export default class CrawlerTaskList extends Component {
 
   toEdit = (record) =>{}
 
+  onPageChange=(page, pageSize)=>{
+    this.setState({
+      offset:pageSize*(page - 1),
+      limited:pageSize
+    },()=>{
+      this.getData()
+    })
+}
+
   createColumns = (columnsKeys) =>{
     const columns = columnsKeys.map(item=>{
       if(item === 'status'){
@@ -173,8 +180,8 @@ export default class CrawlerTaskList extends Component {
     })
     return columns
 }
-  buildColumnsDataSource = (tasks)=>{
-    const dataSource = tasks.map(item=>{
+  buildColumnsDataSource = (resp)=>{
+    const dataSource = resp.list.map(item=>{
       if(item.createdAt){
           let dateFormat = timeStamp2date(item.createdAt)
           item.createdAt = dateFormat
@@ -198,16 +205,17 @@ export default class CrawlerTaskList extends Component {
   getData = async() => {
     this.setState({isLoading:true})
     //网络请求获取数据
-    const columnsKeys = Object.keys(tasks[0])
+    const resp = await getCrawlerTaskList(this.state.offset,this.state.limited)
+    const columnsKeys = Object.keys(resp.list[0])
     columnsKeys.splice(columnsKeys.length-1,1)
     const columns = this.createColumns(columnsKeys)
-    const dataSource = this.buildColumnsDataSource(tasks)
+    const dataSource = this.buildColumnsDataSource(resp)
     
     if(!this.updater.isMounted(this)) return
     this.setState({
       columns:columns,
       dataSource:dataSource,
-      total:tasks.length
+      total:resp.total
     })
     this.setState({isLoading:false})
     
