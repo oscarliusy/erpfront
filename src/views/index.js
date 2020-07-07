@@ -146,6 +146,21 @@ const InstockUpload = Loadable({
     loading: Loading
 })
 
+const CrawlerTaskList = Loadable({
+    loader: () => import('./CrawlerTaskList'),
+    loading: Loading
+})
+
+const CrawlerTaskAdd = Loadable({
+    loader: () => import('./CrawlerTaskAdd'),
+    loading: Loading
+})
+
+const CrawlerTaskDetail = Loadable({
+    loader: () => import('./CrawlerTaskDetail'),
+    loading: Loading
+})
+
 export {
     SignIn,
     SignUp,
@@ -174,5 +189,8 @@ export {
     MaterialEdit,
     ProductEdit,
     PreoutstockEdit,
-    InstockUpload
+    InstockUpload,
+    CrawlerTaskList,
+    CrawlerTaskAdd,
+    CrawlerTaskDetail
 }

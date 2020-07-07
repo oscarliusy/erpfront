@@ -5,7 +5,7 @@ import { PROJECT_CONFIG } from '../config'
 //import io from 'socket.io-client'
 //export const socket = io('http://localhost:4000')
 
-const isDev = process.env.NODE_ENV === 'development'
+//const isDev = process.env.NODE_ENV === 'development'
 
 const service = axios.create({
     baseURL: 'http://rap2api.taobao.org/app/mock/245040'

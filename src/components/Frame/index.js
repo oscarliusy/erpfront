@@ -27,7 +27,7 @@ class Frame extends Component {
             openKeys:['sub1']
         }
     }
-    rootSubmenuKeys = ['sub1', 'sub2', 'sub3'];
+    rootSubmenuKeys = ['sub1', 'sub2', 'sub3','sub4'];
 
     onOpenChange = openKeys => {
         const latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1);
@@ -48,6 +48,8 @@ class Frame extends Component {
       };
 
     onMenuClick=({key})=>{
+        console.log('pathName',key)
+        
         this.props.history.push({
             pathname:key
         })
@@ -173,6 +175,22 @@ class Frame extends Component {
                         >
                                 {
                                 this.props.adminMenu.map(item => {
+                                    return (
+                                        <Menu.Item key={item.pathname}>
+                                            <Icon type={item.icon} />
+                                            <span>{item.title}</span>
+                                        </Menu.Item>
+                                    )
+                                })
+                            }
+                        </SubMenu>
+                        <SubMenu
+                            key="sub4"
+                            title = {<span><Icon type="alert" /> 电商辅助系统 </span>}
+                            onClick = {this.onMenuClick}
+                        >
+                            {
+                                this.props.ecasMenu.map(item => {
                                     return (
                                         <Menu.Item key={item.pathname}>
                                             <Icon type={item.icon} />

@@ -24,7 +24,10 @@ import {
     ProductEdit,
     MaterialEdit,
     PreoutstockEdit,
-    InstockUpload
+    InstockUpload,
+    CrawlerTaskList,
+    CrawlerTaskAdd,
+    CrawlerTaskDetail
     
 } from '../views'
 
@@ -160,8 +163,27 @@ export const commonRoutes = {
     }]
 }
 
-
-
+//ECAS: E-Commerce-Auxiliary-System
+export const ECASRoutes = [{
+    // pathname:'/erp/admin/currency',
+    // component:Currency,
+    pathname:'/erp/crawler/tasklist',
+    component:CrawlerTaskList,
+    isNav:true,
+    exact:true,
+    title:'爬虫任务列表',
+    icon:'bars',
+    roles:['001','002','003']
+},{
+    pathname:'/erp/crawler/taskadd',
+    component:CrawlerTaskAdd,
+    roles:['001','002','003']
+},{
+    pathname:'/erp/crawler/detail/:id',
+    component:CrawlerTaskDetail,
+    roles:['001','002','003']
+}
+]
 
 
 export const adminRoutes = [{
@@ -194,3 +216,4 @@ export const adminRoutes = [{
     component:SignUp,
     roles:['003']
 }]
+
