@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {message} from 'antd'
-import { PROJECT_CONFIG } from '../config'
+//import { PROJECT_CONFIG } from '../config'
 
 const serviceCrawlerMock = axios.create({
   baseURL: 'http://rap2api.taobao.org/app/mock/260231'

@@ -9,48 +9,48 @@ import {
 import { timeStamp2date } from '../../assets/lib/utils'
 import { getCrawlerTaskList } from '../../requests/crawler'
 
-const tasks = [{
-  _id:'11111',
-  name:'亚马逊seal bottle等',
-  type:'SearchWords',
-  createdAt:1594002940450,
-  finishedAt:1594003940450,
-  createdBy:'oscar',
-  status:'Finish',
-  detail:[{
-    KEYWORD:'Seal Bottle',
-    total:240
-  },{
-    KEYWORD:'Bootleg Bottle',
-    total:180
-  }]
-},{
-  _id:'11112',
-  name:'爬取数据',
-  type:'TargetProduct',
-  createdAt:1594086578841,
-  finishedAt:0,
-  createdBy:'wangbo',
-  status:'Ongoing',
-  detail:[{
-    KEYWORD:'Paddle'
-  },{
-    KEYWORD:'Chair'
-  }]
-},{
-  _id:'11113',
-  name:'爬取榜单',
-  type:'Board',
-  createdAt:1594086598841,
-  finishedAt:0,
-  createdBy:'wangbo',
-  status:'Error',
-  detail:[{
-    KEYWORD:'Book'
-  },{
-    KEYWORD:'Coat'
-  }]
-}]
+// const tasks = [{
+//   _id:'11111',
+//   name:'亚马逊seal bottle等',
+//   type:'SearchWords',
+//   createdAt:1594002940450,
+//   finishedAt:1594003940450,
+//   createdBy:'oscar',
+//   status:'Finish',
+//   detail:[{
+//     KEYWORD:'Seal Bottle',
+//     total:240
+//   },{
+//     KEYWORD:'Bootleg Bottle',
+//     total:180
+//   }]
+// },{
+//   _id:'11112',
+//   name:'爬取数据',
+//   type:'TargetProduct',
+//   createdAt:1594086578841,
+//   finishedAt:0,
+//   createdBy:'wangbo',
+//   status:'Ongoing',
+//   detail:[{
+//     KEYWORD:'Paddle'
+//   },{
+//     KEYWORD:'Chair'
+//   }]
+// },{
+//   _id:'11113',
+//   name:'爬取榜单',
+//   type:'Board',
+//   createdAt:1594086598841,
+//   finishedAt:0,
+//   createdBy:'wangbo',
+//   status:'Error',
+//   detail:[{
+//     KEYWORD:'Book'
+//   },{
+//     KEYWORD:'Coat'
+//   }]
+// }]
 
 const titleDisplayMap = {
   _id:'Id',

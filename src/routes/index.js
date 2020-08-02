@@ -181,7 +181,11 @@ export const ECASRoutes = [{
 },{
     pathname:'/erp/crawler/detail/:id',
     component:CrawlerTaskDetail,
-    roles:['001','002','003']
+    roles:['001','002','003'],
+    isNav:true,
+    exact:true,
+    title:'仿海卖页面调试',
+    icon:'bars'
 }
 ]
 
