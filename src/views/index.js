@@ -161,6 +161,11 @@ const CrawlerTaskDetail = Loadable({
     loading: Loading
 })
 
+const CrawlerBestSellerList = Loadable({
+    loader: () => import('./CrawlerBestSellerList'),
+    loading: Loading
+})
+
 export {
     SignIn,
     SignUp,
@@ -192,5 +197,6 @@ export {
     InstockUpload,
     CrawlerTaskList,
     CrawlerTaskAdd,
-    CrawlerTaskDetail
+    CrawlerTaskDetail,
+    CrawlerBestSellerList
 }

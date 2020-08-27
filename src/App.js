@@ -21,8 +21,8 @@ const mapState = state =>({
 class App extends Component {
     render() {
         return (
-            // this.props.isSignIn
-            // ?
+            this.props.isSignIn
+            ?
             <Frame 
                 commonMaterialMenu = {commonMaterialMenu}
                 commonProductMenu = {commonProductMenu}
@@ -111,8 +111,8 @@ class App extends Component {
                     <Redirect to='/404/' />
                 </Switch>
             </Frame>
-            // :
-            // <Redirect to="/signin" />
+            :
+            <Redirect to="/signin" />
         )
     }
 }

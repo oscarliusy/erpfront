@@ -27,7 +27,8 @@ import {
     InstockUpload,
     CrawlerTaskList,
     CrawlerTaskAdd,
-    CrawlerTaskDetail
+    CrawlerTaskDetail,
+    CrawlerBestSellerList
     
 } from '../views'
 
@@ -185,6 +186,14 @@ export const ECASRoutes = [{
     isNav:true,
     exact:true,
     title:'仿海卖页面调试',
+    icon:'bars'
+},{
+    pathname:'/erp/crawler/bestsellers',
+    component:CrawlerBestSellerList,
+    roles:['001','002','003'],
+    isNav:true,
+    exact:true,
+    title:'Best Sellers',
     icon:'bars'
 }
 ]
