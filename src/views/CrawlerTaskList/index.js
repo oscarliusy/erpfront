@@ -53,15 +53,19 @@ import { getCrawlerTaskList } from '../../requests/crawler'
 // }]
 
 const titleDisplayMap = {
-  _id:'Id',
+  SN:'序号',
   name:'任务名称',
-  type:'任务类型',
+  taskType:'任务类型',
+  region:'区域',
+  searchList:'检索词',
   createdAt: '开始时间',
   finishedAt:'结束时间',
-  status:'状态',
   createdBy: '用户',
-  searchList:'检索词列表',
-  KEYWORD:'检索词'
+  status:'状态'
+}
+
+const taskTypeMap = {
+  "1":"bestSellers",
 }
 
 const statusColorMap = {
@@ -80,9 +84,11 @@ const statusColorMap = {
 }
 
 const crawlerTypeMap = {
+  1:'bestSellers',
   SearchWords:'关键词',
   TargetProduct:'指定产品',
-  Board:'榜单'
+  Board:'榜单',
+  
 
 }
 
@@ -194,8 +200,11 @@ export default class CrawlerTaskList extends Component {
       if(item.status){
         item.status = statusColorMap[item.status].text
       }
-      if(item.type){
-        item.type = crawlerTypeMap[item.type]
+      if(item.taskType){
+        item.taskType = crawlerTypeMap[item.taskType]
+      }
+      if(item.searchList){
+        item.searchList = item.searchList[0]+'...'
       }
       return item
     })
@@ -206,8 +215,7 @@ export default class CrawlerTaskList extends Component {
     this.setState({isLoading:true})
     //网络请求获取数据
     const resp = await getCrawlerTaskList(this.state.offset,this.state.limited)
-    const columnsKeys = Object.keys(resp.list[0])
-    columnsKeys.splice(columnsKeys.length-1,1)
+    const columnsKeys = Object.keys(titleDisplayMap)
     const columns = this.createColumns(columnsKeys)
     const dataSource = this.buildColumnsDataSource(resp)
     
@@ -237,7 +245,7 @@ export default class CrawlerTaskList extends Component {
               }
           >
               <Table
-                  rowKey={record=>record._id}
+                  rowKey={record=>record.SN}
                   dataSource={this.state.dataSource}
                   columns={this.state.columns}
                   pagination={{
