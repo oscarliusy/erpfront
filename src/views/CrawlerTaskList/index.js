@@ -2,55 +2,16 @@ import React, { Component } from 'react'
 import { 
   Card,
   Table,
-  Button,
+  Menu,
+  Dropdown,
   Spin,
-  Tag
+  Tag,
+  Button,
+  Icon,
 } from 'antd'
 import { timeStamp2date } from '../../assets/lib/utils'
 import { getCrawlerTaskList } from '../../requests/crawler'
 
-// const tasks = [{
-//   _id:'11111',
-//   name:'亚马逊seal bottle等',
-//   type:'SearchWords',
-//   createdAt:1594002940450,
-//   finishedAt:1594003940450,
-//   createdBy:'oscar',
-//   status:'Finish',
-//   detail:[{
-//     KEYWORD:'Seal Bottle',
-//     total:240
-//   },{
-//     KEYWORD:'Bootleg Bottle',
-//     total:180
-//   }]
-// },{
-//   _id:'11112',
-//   name:'爬取数据',
-//   type:'TargetProduct',
-//   createdAt:1594086578841,
-//   finishedAt:0,
-//   createdBy:'wangbo',
-//   status:'Ongoing',
-//   detail:[{
-//     KEYWORD:'Paddle'
-//   },{
-//     KEYWORD:'Chair'
-//   }]
-// },{
-//   _id:'11113',
-//   name:'爬取榜单',
-//   type:'Board',
-//   createdAt:1594086598841,
-//   finishedAt:0,
-//   createdBy:'wangbo',
-//   status:'Error',
-//   detail:[{
-//     KEYWORD:'Book'
-//   },{
-//     KEYWORD:'Coat'
-//   }]
-// }]
 
 const titleDisplayMap = {
   SN:'序号',
@@ -62,10 +23,6 @@ const titleDisplayMap = {
   finishedAt:'结束时间',
   createdBy: '用户',
   status:'状态'
-}
-
-const taskTypeMap = {
-  "1":"bestSellers",
 }
 
 const statusColorMap = {
@@ -88,8 +45,6 @@ const crawlerTypeMap = {
   SearchWords:'关键词',
   TargetProduct:'指定产品',
   Board:'榜单',
-  
-
 }
 
 const colorMap = {
@@ -97,6 +52,8 @@ const colorMap = {
   '进行中':'green',
   '错误终止':'red'
 }
+
+
 
 export default class CrawlerTaskList extends Component {
   constructor(){
@@ -113,7 +70,15 @@ export default class CrawlerTaskList extends Component {
     }
   }  
 
-  onDetailClick = (record) =>{}
+  //根据taskType，进入不同的详情页，并且携带taskId，便于查询
+  onDetailClick = (record) =>{
+    console.log('查看爬虫结果')
+    if(record.taskType === 'bestSellers'){
+      //在list中仍然保留_id,传入详情页
+      this.props.history.push(`/erp/crawler/bestsellers/detail/${record._id}`)
+      console.log('进入bestSellers详情页')
+    }
+  }
 
   onCopyClick = async(record) => {}
 
@@ -178,7 +143,7 @@ export default class CrawlerTaskList extends Component {
                  onClick = {this.toEdit.bind(this,record)}
                  disabled = {record.has_out}
                 >
-                    编辑
+                    编辑表单
                 </Button>
             </>
           )
@@ -201,7 +166,7 @@ export default class CrawlerTaskList extends Component {
         item.status = statusColorMap[item.status].text
       }
       if(item.taskType){
-        item.taskType = crawlerTypeMap[item.taskType]
+        item.taskType = crawlerTypeMap[item.taskType] ? crawlerTypeMap[item.taskType] : item.taskType 
       }
       if(item.searchList){
         item.searchList = item.searchList[0]+'...'
@@ -233,7 +198,21 @@ export default class CrawlerTaskList extends Component {
     this.getData()
   }
 
+  //新增爬虫任务，根据key进入不同表单页
+  onAddClick = (key) =>{
+    console.log('click',key.key)
+    //进入新建任务的不同分支表单
+    //this.props.history.push(`/erp/crawler/newTask/${key.key}`)
+  }
+
   render() {
+    const menu = (
+      <Menu onClick={this.onAddClick}>
+        <Menu.Item key="bestSellers">Best Sellers</Menu.Item>
+        <Menu.Item key="2" disabled>自由检索（disabled）</Menu.Item>
+        <Menu.Item key="3" disabled>其他任务（disabled）</Menu.Item>
+      </Menu>
+    );
     return (
       <>
        <Spin spinning={this.state.isLoading}>
@@ -241,7 +220,11 @@ export default class CrawlerTaskList extends Component {
               title="爬虫任务记录"
               bordered={false}
               extra={
-                  <Button onClick={this.toPreoutstockAdd}>新建爬虫任务</Button>
+                <Dropdown overlay={menu}>
+                  <span className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                    新增爬虫任务 <Icon type="down" />
+                  </span>
+                </Dropdown>
               }
           >
               <Table

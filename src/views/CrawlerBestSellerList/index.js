@@ -15,7 +15,7 @@ const { Search } = Input
 const { Option } = Select
 //本地模拟数据
 //const resp = data.data
-const testTaskId = "5f44ddff704b340f249a1582"
+//const testTaskId = "5f44ddff704b340f249a1582"
 
 const titleDisplayMap = {
   SN:'序号',
@@ -41,11 +41,12 @@ export default class CrawlerBestSellerList extends Component {
       total:0,        //记录总数
 
       //顶部任务详情
+      name:'',
       firstOrder:'',
-      user:'',
-      startAt:'',
-      finishAt:'',
-      regionCode:'',
+      createdBy:'',
+      createdAt:'',
+      finishedAt:'',
+      region:'',
 
       //请求参数
       offset:0,     //页数
@@ -164,7 +165,9 @@ export default class CrawlerBestSellerList extends Component {
     try{
       this.setState({isLoading:true})
       const params = this.buildRequestParams()
-      const resp = await getBestSellersDetailById(testTaskId,params)
+      const id = this.props.location.pathname.split('/').pop()
+      console.log('taskId:',id)
+      const resp = await getBestSellersDetailById(id,params)
       this.setGeneralInfo(resp)
       //为了控制显示顺序使用titleDisplayMap生成表头
       const columnsKeys = Object.keys(titleDisplayMap)
@@ -184,11 +187,12 @@ export default class CrawlerBestSellerList extends Component {
 
   setGeneralInfo = (resp) =>{
     this.setState({
+      name:resp.name,
       firstOrder:resp.firstOrder,
-      user:resp.user,
-      startAt:timeStamp2date(resp.startAt),
-      finishAt:timeStamp2date(resp.finishAt),
-      regionCode:resp.regionCode
+      createdBy:resp.createdBy,
+      createdAt:timeStamp2date(resp.createdAt),
+      finishedAt:timeStamp2date(resp.finishedAt),
+      region:resp.region
     })
   }
 
@@ -237,11 +241,12 @@ export default class CrawlerBestSellerList extends Component {
               bordered={false}
               extra={
                 <div>
-                  <span style={{paddingLeft:"10px" }}>一级菜单：{this.state.firstOrder}</span>
-                  <span style={{paddingLeft:"10px" }}>操作人：{this.state.user}</span>
-                  <span style={{paddingLeft:"10px" }}>开始时间：{this.state.startAt}</span>
-                  <span style={{paddingLeft:"10px" }}>结束时间：{this.state.finishAt}</span>
-                  <span style={{paddingLeft:"10px" }}>区域代码：{this.state.regionCode}</span>
+                  <span style={{paddingLeft:"10px" }}><b>任务名称：</b>{this.state.name}</span>
+                  <span style={{paddingLeft:"10px" }}><b>一级菜单：</b>{this.state.firstOrder}</span>
+                  <span style={{paddingLeft:"10px" }}><b>操作人：</b>{this.state.createdBy}</span>
+                  <span style={{paddingLeft:"10px" }}><b>开始时间：</b>{this.state.createdAt}</span>
+                  <span style={{paddingLeft:"10px" }}><b>结束时间：</b>{this.state.finishedAt}</span>
+                  <span style={{paddingLeft:"10px" }}><b>区域：</b>{this.state.region}</span>
                 </div>
               }
           >

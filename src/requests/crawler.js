@@ -44,7 +44,7 @@ serviceCrawler.interceptors.response.use((resp)=>{
 })
 
 export const getCrawlerTaskList = (offset = 0, limited = 10) =>{
-  return serviceCrawlerMock.post('/ecas/v1/crawler/tasklist',{
+  return serviceCrawler.post('/crawler/v1/task/list',{
       offset,
       limited
   })

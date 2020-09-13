@@ -188,13 +188,10 @@ export const ECASRoutes = [{
     title:'仿海卖页面调试',
     icon:'bars'
 },{
-    pathname:'/erp/crawler/bestsellers',
+    pathname:'/erp/crawler/bestsellers/detail/:id',
     component:CrawlerBestSellerList,
     roles:['001','002','003'],
-    isNav:true,
-    exact:true,
-    title:'Best Sellers',
-    icon:'bars'
+    exact:true
 }
 ]
 
