@@ -43,13 +43,13 @@ class Edit extends Component {
             usersList:[],
 
             purchaserList:[],
-            purchaser:''
+            purchaser:'',
         }
     }
 
     initData = () =>{
         this.setState({
-            isSpin:true
+            isSpin:true,
         })
         getMaterialDetailById(this.props.location.pathname.split('/').pop())
         .then(resp=>{
@@ -97,10 +97,8 @@ class Edit extends Component {
             })
             postMaterialEdit(params)
             .then(resp=>{
-                console.log(resp);
-                
+                //console.log(resp);
                 message.success(resp.msg)
-                this.props.history.push('/erp/comm/material/list')
             })
             .catch(err=>{
                 console.log(err)
@@ -157,6 +155,7 @@ class Edit extends Component {
     }
 
     componentDidMount(){
+        
         this.initData()  
     }
 

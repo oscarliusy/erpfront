@@ -11,11 +11,13 @@ import {
     Button,
     Input,
     Icon,
-    Spin
+    Spin,
+    Modal, message
 } from 'antd'
-import { getInventoryMaterialList } from '../../requests'
+import { ExclamationCircleOutline} from '@ant-design/icons'
+import { getInventoryMaterialList,deleteIMItem } from '../../requests'
 
-
+const { confirm } = Modal;
 
 
 const { Search } = Input
@@ -53,6 +55,28 @@ export default class IMList extends Component {
         })
         
     }
+
+    showConfirm = (record) => {
+        confirm({
+          title: '你确定要删除该物料么？',
+          content: `${record.uniqueId} 数量: ${record.amount}`,
+          onOk() {
+            //this.toDelete(record)
+            deleteIMItem(record.id)
+            .then(resp=>{
+                if(resp.status === 'success'){
+                    message.success('已成功删除,请刷新页面')
+                }else{
+                    message.error('删除失败，请刷新确认')
+                }
+            })
+          },
+          onCancel() {
+            console.log('Cancel');
+          },
+        });
+      }
+
     createColumns = (columnsKeys) =>{
         const columns = columnsKeys.map(item=>{
             if( item === 'image'){
@@ -87,7 +111,10 @@ export default class IMList extends Component {
             key:'action',
             render:(text,record)=>{
               return (
-                <Button size="small" type="primary" onClick={this.toEdit.bind(this,record)}>编辑</Button>
+                <>
+                    <Button size="small" type="primary" onClick={this.toEdit.bind(this,record)}>编辑</Button>
+                    <Button disabled size="small" type="default" onClick={this.showConfirm.bind(this,record)} style = {{marginLeft:"5px"}} >删除</Button>
+                </>
               )
             }
         })
@@ -95,7 +122,7 @@ export default class IMList extends Component {
     }
 
     toEdit = (record) =>{
-        this.props.history.push(`/erp/comm/material/edit/${record.id}`)
+        window.open(`#/erp/comm/material/edit/${record.id}`)
     }
 
     getData = () =>{

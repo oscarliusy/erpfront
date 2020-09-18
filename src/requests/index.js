@@ -81,6 +81,10 @@ export const getInventoryMaterialList = (offset = 0, limited = 10,keyword,sort) 
     })
 }
 
+export const deleteIMItem = (id) =>{
+    return service.post('/api/v1/material/delete/${id}')
+}
+
 export const getMaterialDetailById = (id) =>{
     return serviceKoa.post(`/api/v1/material/detail/${id}`)
 }
@@ -290,3 +294,4 @@ export const getAccountManageLogs = (offset = 0, limited = 10) =>{
 export const checkStatus = () =>{
     return serviceKoa.get('/api/v1/checkstatus/env')
 }
+
