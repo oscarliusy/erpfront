@@ -43,7 +43,8 @@ export default class IMList extends Component {
             limited:10,
             searchword:'',
             sort:1,
-            totalIMNumberString:'未计算'
+            totalIMNumberString:'未计算',
+            totalIMCostString:'未计算'
 
         }
     }
@@ -186,7 +187,8 @@ export default class IMList extends Component {
         this.setState({isLoading:true})
         const resp = await getIMtotalNumber()
         this.setState({
-            totalIMNumberString:String(resp.totalNum)
+            totalIMNumberString:String(resp.totalNum),
+            totalIMCostString:String(resp.totalCost)
         })
         this.setState({isLoading:false})
     }
@@ -203,11 +205,12 @@ export default class IMList extends Component {
                         <>
                              <span>当前物料种类：{this.state.totalInventory}</span>
                              <span style = {{marginLeft:"20px"}}>物料总数：{this.state.totalIMNumberString}</span>
+                             <span style = {{marginLeft:"20px"}}>采购成本：{this.state.totalIMCostString}</span>
                         </>}
                     bordered={false}
                     extra={
                         <>
-                            <Button onClick={this.getTotalNum} type="primary">计算物料总数</Button>
+                            <Button onClick={this.getTotalNum} type="primary">物料总数及采购成本</Button>
                             <Button onClick={this.toExcel} style = {{marginLeft:"10px"}}>导出当前页excel</Button>
                         </>
                     }
