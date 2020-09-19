@@ -14,8 +14,7 @@ import {
     Spin,
     Modal, message
 } from 'antd'
-import { ExclamationCircleOutline} from '@ant-design/icons'
-import { getInventoryMaterialList,deleteIMItem } from '../../requests'
+import { getInventoryMaterialList,deleteIMItem,getIMtotalNumber } from '../../requests'
 
 const { confirm } = Modal;
 
@@ -43,7 +42,9 @@ export default class IMList extends Component {
             offset:0,
             limited:10,
             searchword:'',
-            sort:1
+            sort:1,
+            totalIMNumberString:'未计算'
+
         }
     }
     sortByAmount=()=>{
@@ -56,16 +57,16 @@ export default class IMList extends Component {
         
     }
 
-    showConfirm = (record) => {
+    showConfirm = (record,getData) => {
         confirm({
           title: '你确定要删除该物料么？',
           content: `${record.uniqueId} 数量: ${record.amount}`,
           onOk() {
-            //this.toDelete(record)
             deleteIMItem(record.id)
             .then(resp=>{
                 if(resp.status === 'success'){
-                    message.success('已成功删除,请刷新页面')
+                    message.success('已成功删除')
+                    getData() //刷新页面数据，不跳转
                 }else{
                     message.error('删除失败，请刷新确认')
                 }
@@ -113,7 +114,10 @@ export default class IMList extends Component {
               return (
                 <>
                     <Button size="small" type="primary" onClick={this.toEdit.bind(this,record)}>编辑</Button>
-                    <Button disabled size="small" type="default" onClick={this.showConfirm.bind(this,record)} style = {{marginLeft:"5px"}} >删除</Button>
+                    <Button  size="small" type="default" disabled
+                        onClick={this.showConfirm.bind(this,record,this.getData)}
+                        style = {{marginLeft:"5px"}} 
+                    >删除</Button>
                 </>
               )
             }
@@ -178,6 +182,15 @@ export default class IMList extends Component {
         console.log("还没有开发")
     }
 
+    getTotalNum = async() =>{
+        this.setState({isLoading:true})
+        const resp = await getIMtotalNumber()
+        this.setState({
+            totalIMNumberString:String(resp.totalNum)
+        })
+        this.setState({isLoading:false})
+    }
+
     componentDidMount(){
         this.getData()
     }
@@ -186,10 +199,17 @@ export default class IMList extends Component {
         return (
             <Spin spinning={this.state.isLoading}>
                 <Card
-                    title={<span>当前物料种类：{this.state.totalInventory}</span>}
+                    title={
+                        <>
+                             <span>当前物料种类：{this.state.totalInventory}</span>
+                             <span style = {{marginLeft:"20px"}}>物料总数：{this.state.totalIMNumberString}</span>
+                        </>}
                     bordered={false}
                     extra={
-                        <Button onClick={this.toExcel}>导出当前页excel</Button>
+                        <>
+                            <Button onClick={this.getTotalNum} type="primary">计算物料总数</Button>
+                            <Button onClick={this.toExcel} style = {{marginLeft:"10px"}}>导出当前页excel</Button>
+                        </>
                     }
                 >
                     <div style={{width:"600px",padding:"10px"}}>

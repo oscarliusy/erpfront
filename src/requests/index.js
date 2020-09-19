@@ -82,7 +82,11 @@ export const getInventoryMaterialList = (offset = 0, limited = 10,keyword,sort) 
 }
 
 export const deleteIMItem = (id) =>{
-    return service.post('/api/v1/material/delete/${id}')
+    return service.post(`/api/v1/material/delete/${id}`)
+}
+
+export const getIMtotalNumber = () =>{
+    return serviceKoa.post(`/api/v1/material/total`)
 }
 
 export const getMaterialDetailById = (id) =>{
