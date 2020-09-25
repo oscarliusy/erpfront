@@ -173,7 +173,7 @@ export default class IMList extends Component {
     
     onSearch = (value)=>{
         this.setState({
-             searchword:value
+             searchword:value.toString().trim()
         },()=>{
             this.getData()
         })

@@ -18,7 +18,8 @@ const titleDisplayMap = {
     c_time:'时间',
     user:'用户',
     description:'备注',
-    amount:'入库数量',
+    amountIn:'入库数量',
+    amount:'当前数量',
     createAt:'时间',
     action:'操作内容'
 }
@@ -142,6 +143,7 @@ export default class IMLogs extends Component {
     }
 
     buildColumnsDataSource = (resp)=>{
+        console.log('detail:',resp)
         const columnsKeys = Object.keys(resp.list[0])
         const columns = this.createColumns(columnsKeys,this.state.currentTab)
         const dataSource = resp.list.map(item=>{
