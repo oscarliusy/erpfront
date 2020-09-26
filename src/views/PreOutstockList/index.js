@@ -163,6 +163,7 @@ export default class PreOutstockList extends Component {
         })
         getPreoutstockList(this.state.offset,this.state.limited)
         .then(resp=>{
+            console.log(resp)
             const columnsKeys = Object.keys(resp.list[0])
             columnsKeys.splice(columnsKeys.length-2,2)//这里要把product,has_out去除，具体根据服务器决定如何处理。
             const columns = this.createColumns(columnsKeys)

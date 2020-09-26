@@ -34,7 +34,7 @@ const titleDisplayMap = {
     site:'Site'
 }
 
-const userList = ['FAN','LICH','BO','OSCAR']
+//const userList = ['FAN','LICH','BO','OSCAR']
 
 const mapState = (state) =>{
     const { products } = state.preoutstockTable
@@ -120,7 +120,7 @@ class PreOutstockAdd extends Component {
     }
 
     findUserId = (userName)=>{
-        let id = 0
+        let id = 1
         for(let item of this.state.usersList){
             if(item.name === userName){
                 id = item.id
@@ -176,7 +176,7 @@ class PreOutstockAdd extends Component {
         })
     }
 
-    initData = () =>{
+    initData = async() =>{
         this.props.resetPreoutstockProductTable()
         this.initUserList()
     }
@@ -186,9 +186,10 @@ class PreOutstockAdd extends Component {
         let _preoutstockerList = userRes.map(item=>{
             return item.name
         })
+
         this.setState({
-            preoutstockerList:_preoutstockerList,
-            usersList:userRes
+            preoutstockerList:_preoutstockerList,//["BO", "FAN", "LICH", "oscar", "R.X", "tester"]
+            usersList:userRes//[{id: 2, name: "BO"},{id: 3, name: "FAN"}2: {id: 5, name: "LICH"},{id: 1, name: "oscar"},{id: 4, name: "R.X"},{id: 6, name: "tester"}]
         })
     }
 
@@ -365,7 +366,7 @@ class PreOutstockAdd extends Component {
                                 style={{ width: 200 }} 
                             >
                                 {
-                                    userList.map(item=>{
+                                    this.state.preoutstockerList.map(item=>{
                                         return(
                                             <Option value={item} key={item}>{item}</Option>
                                         )
