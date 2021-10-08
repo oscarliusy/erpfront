@@ -185,14 +185,11 @@ export default class PreOutstockList extends Component {
         })
     }
 
-    onPageChange=(page, pageSize)=>{
+    onPageChange= page => {
         this.setState({
-          offset:pageSize*(page - 1),
-          limited:pageSize
-        },()=>{
-          this.getData()
-        })
-    }
+          currentOutStockIdx: page,
+        });
+      };
 
     onClose = () => {
         this.setState({
@@ -226,7 +223,7 @@ export default class PreOutstockList extends Component {
                                 total:this.state.total,
                                 onChange : this.onPageChange,
                                 showQuickJumper:true,
-                                current: this.state.offset / this.state.limited + 1
+                                current: this.state.currentOutStockIdx,
                             }}
                         />
                     </Card>
