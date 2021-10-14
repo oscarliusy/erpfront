@@ -235,14 +235,21 @@ class ProductOutstock extends Component {
                     console.log('params',params)
                     this.setState({isSubmitSpin:true})
                     let upRes = await postOutstockUpload(params)
-                    if(upRes.status === 'succeed'){
-                        message.success(upRes.msg)
+                    if(upRes.status === 'succeed' && upRes.productNotFound.list.length === 0){
                         setTimeout(()=>{
                             this.props.history.push('/erp/comm/product/logs')
                         },1500)
                         this.setState({isSubmitSpin:false})
                     }else if(upRes.status === 'failed'){
-                        message.warning(upRes.msg)
+                        if(upRes.productNotFound.list.length > 0){
+                            var warningMsg ="产品出库失败，以下产品未找到："
+                            for(let i = 0; i < upRes.productNotFound.list.length; i++) {
+                               warningMsg +="\n" + JSON.stringify(upRes.productNotFound.list[i]);
+                            }
+                            message.warning(warningMsg,10)
+                        }else{
+                            message.warning(upRes.msg)
+                        }
                         this.setState({isSubmitSpin:false})
                     }else{
                         this.setState({isSubmitSpin:false})
