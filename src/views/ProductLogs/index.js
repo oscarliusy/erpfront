@@ -77,7 +77,6 @@ export default class ProductLogs extends Component {
     }
 
     toOutstockDetail = (record) =>{
-        console.log(record.id)
         this.setState({
             idDrawer:record.id
         })
@@ -97,6 +96,7 @@ export default class ProductLogs extends Component {
     onClose = () => {
         this.setState({
           visible: false,
+          currentTab:'tab1'
         });
     }
 
@@ -187,7 +187,7 @@ export default class ProductLogs extends Component {
         .finally(()=>{
             this.setState({
                 isLoadingTab:false
-            }) 
+            })
         })
     }
 
@@ -262,7 +262,7 @@ export default class ProductLogs extends Component {
                 return
             default:
                 return
-        }  
+        }
     }
 
     componentDidMount(){
