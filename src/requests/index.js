@@ -153,6 +153,13 @@ export const getProductDetailById = (id) =>{
 export const saveProductEdit = (params)=>{
     return serviceKoa.post('/api/v1/product/edit',params)
 }
+export const postProductRelation = () =>{
+    return serviceKoa.post('/api/v1/product/pmrelation/list')
+}
+
+export const postSearchProductRelation = (params) =>{
+    return serviceKoa.post('/api/v1/product/pmrelation/search',params)
+}
 
 export const getSiteMap = () =>{
     return serviceKoa.post('/api/v1/product/siteMap')

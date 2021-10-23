@@ -139,11 +139,15 @@ export default class ProductLogs extends Component {
         if(tabName === "tab1"){
             columns.push({
                 title:'操作',
-                key:'action',
+                key:'list',
                 render:(text,record)=>{
                   return (
-                    <Button size="small" type="primary" onClick={this.toOutstockDetail.bind(this,record)}>查看详情</Button>
-                  )
+                      <div>
+                          <Button size="small" type="primary" onClick={this.toOutstockDetail.bind(this,record)} >查看详情</Button>
+                            &nbsp;&nbsp;
+                          <Button size="small" type="primary" onClick={this.toOutstockDetail.bind(this,record)} >查看库存为负详情</Button>
+                      </div>
+                  );
                 }
             })
         }

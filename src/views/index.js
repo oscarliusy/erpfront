@@ -64,6 +64,10 @@ const ProductList = Loadable({
     loader: () => import('./ProductList'),
     loading: Loading
 })
+const ProductMaterialRelation = Loadable({
+    loader: () => import('./ProductMaterialRelation'),
+    loading: Loading
+})
 
 const ProductAdd = Loadable({
     loader: () => import('./ProductAdd'),
@@ -179,6 +183,7 @@ export {
     Instock,
     IMLogs,
     ProductList,
+    ProductMaterialRelation,
     ProductAdd,
     ProductOutstock,
     PreOutstockAdd,

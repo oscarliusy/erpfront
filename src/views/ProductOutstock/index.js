@@ -232,17 +232,26 @@ class ProductOutstock extends Component {
                 if(outstockError){
                     message.error(outstockError)
                 }else{
-                    console.log('params',params)
+                    var warningMsg
                     this.setState({isSubmitSpin:true})
                     let upRes = await postOutstockUpload(params)
                     if(upRes.status === 'succeed' && upRes.productNotFound.list.length === 0){
-                        setTimeout(()=>{
-                            this.props.history.push('/erp/comm/product/logs')
-                        },1500)
+                        if(upRes.negativeStock !== 0){
+                            warningMsg = "有"+upRes.negativeStock+"次物料扣减库操作存为负数，详情见最新日志"
+                            message.success(warningMsg)
+                            // setTimeout(()=>{
+                            //     this.props.history.push('/erp/comm/product/logs')
+                            // },2000)
+                        }else{
+                            message.success('success')
+                            setTimeout(()=>{
+                                this.props.history.push('/erp/comm/product/logs')
+                            },1500)
+                        }
                         this.setState({isSubmitSpin:false})
                     }else if(upRes.status === 'failed'){
                         if(upRes.productNotFound.list.length > 0){
-                            var warningMsg ="产品出库失败，以下产品未找到："
+                            warningMsg ="产品出库失败，以下产品未找到："
                             for(let i = 0; i < upRes.productNotFound.list.length; i++) {
                                warningMsg +="\n" + JSON.stringify(upRes.productNotFound.list[i]);
                             }

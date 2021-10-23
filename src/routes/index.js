@@ -10,6 +10,7 @@ import {
     Instock,
     IMLogs,
     ProductList,
+    ProductMaterialRelation,
     ProductAdd,
     ProductOutstock,
     PreOutstockAdd,
@@ -97,6 +98,13 @@ export const commonRoutes = {
        icon:'shop',
        roles:['001','002','003']
     },{
+        pathname:'/erp/comm/product/pmrelationship/list' ,
+        component:ProductMaterialRelation,
+        isNav:true,
+        title:'产品物料关系',
+        icon:'bars',
+        roles:['001','002','003']
+     },{
         pathname:'/erp/comm/product/add' ,
         component:ProductAdd,
         isNav:true,
