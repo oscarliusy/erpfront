@@ -161,6 +161,10 @@ export const postSearchProductRelation = (params) =>{
     return serviceKoa.post('/api/v1/product/pmrelation/search',params)
 }
 
+export const postShowMeterialNoneProduct = () =>{
+    return serviceKoa.post('/api/v1/product/pmrelation/showmeterial')
+}
+
 export const getSiteMap = () =>{
     return serviceKoa.post('/api/v1/product/siteMap')
 }

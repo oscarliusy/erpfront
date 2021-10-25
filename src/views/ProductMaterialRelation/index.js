@@ -1,6 +1,6 @@
-import { Table,Input,Card } from 'antd';
+import { Table,Input,Card,Drawer,Button } from 'antd';
 import React, { Component } from 'react'
-import { postProductRelation,postSearchProductRelation } from '../../requests'
+import { postProductRelation,postSearchProductRelation,postShowMeterialNoneProduct } from '../../requests'
 const { Search } = Input;
 
 const title =[{
@@ -28,13 +28,27 @@ const title =[{
       ]
     }
 ]
+const meterialColumns = [
+  {
+    title: 'uniqueId',
+    dataIndex: 'uniqueId',
+    key: 'uniqueId',
+  },
+  {
+    title: 'description',
+    dataIndex: 'description',
+    key: 'description',
+  },
+]
 
 export default class PMRelationship extends Component{
   constructor(props){
     super(props)
     this.state = {
       dataSource:[],
-      columns:[],
+      meterial:[],
+      visible:false,
+      meterialKeys:[]
     };
   }
   componentDidMount(){
@@ -82,13 +96,32 @@ export default class PMRelationship extends Component{
       });
     })
   }
+  showDrawer = ()=> {
+    postShowMeterialNoneProduct().then(response => {
+      console.log(response[0])
+      console.log(typeof(response))
+      this.setState({
+        meterial:response,
+        visible:true
+      })
+    })
+  }
+  onClose = () => {
+    this.setState({
+      visible: false,
+    });
+  };
 
   render(){
         return (
             <Card title="产品物料关系">
             <Search placeholder="输入SKU或者description" enterButton="Search" size="large" style={{ width: 600 }} onSearch={value => this.onSearch(value)} />
+            <Button type="primary" size = "large" style={{float:"right"}} onClick={this.showDrawer} >查看孤品物料</Button>
               <br/><br/>
             <Table columns={this.state.columns} dataSource={this.state.dataSource} bordered pagination={{showQuickJumper:true} } />
+            <Drawer title="孤品物料" placement="right" onClose={this.onClose} destroyOnClose={true} visible={this.state.visible} width="40%">
+              <Table columns={meterialColumns} dataSource={this.state.meterial} bordered />
+            </Drawer>
             </Card>
         )
   }
