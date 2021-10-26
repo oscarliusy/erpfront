@@ -97,6 +97,10 @@ export const postMaterialEdit = (params)=>{
     return serviceKoa.post('/api/v1/material/edit',params)
 }
 
+export const deleteMaterial = (params)=>{
+    return serviceKoa.post('/api/v1/material/delete',params)
+}
+
 export const getPurchaserList = () =>{
     return serviceKoa.post('/api/v1/material/purchaserList')
 }
@@ -153,6 +157,11 @@ export const getProductDetailById = (id) =>{
 export const saveProductEdit = (params)=>{
     return serviceKoa.post('/api/v1/product/edit',params)
 }
+
+export const  delProduct = (params)=>{
+    return  serviceKoa.post('/api/v1/product/delete',params)
+}
+
 export const postProductRelation = () =>{
     return serviceKoa.post('/api/v1/product/pmrelation/list')
 }

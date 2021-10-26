@@ -10,13 +10,15 @@ import {
     Input,
     Spin,
     Descriptions,
-    Drawer
+    Drawer,
+    message,
+    Popconfirm
 } from 'antd'
-import { getProductList } from '../../requests'
+import { getProductList,delProduct } from '../../requests'
 import { timeStamp2date } from '../../assets/lib/utils'
 
 const { Search } = Input
-
+const text = '确定要删除这个产品吗？';
 const titleDisplayMap = {
     id:'Id',
     site:'Site',
@@ -104,11 +106,14 @@ export default class ProductList extends Component {
         columns.push({
             title:'Action',
             key:'action',
-            render:(text,record)=>{
+            render:(record)=>{
               return (
                 <>
                     <Button size="small" type="primary" onClick={this.onDetailClick.bind(this,record)}>详情</Button>
                     <Button size="small" type="link" onClick={this.toEdit.bind(this,record)}>编辑</Button>
+                    <Popconfirm placement="topRight" title={text} onConfirm={this.confirm.bind(this,record)} okText="Yes" cancelText="No">
+                        <Button size="small" type="link" >删除产品</Button>
+                    </Popconfirm>
                 </>
               )
             }
@@ -119,6 +124,17 @@ export default class ProductList extends Component {
     toEdit = (record) =>{
         this.props.history.push(`/erp/comm/product/edit/${record.id}`)
     }
+
+    confirm = (record)=>{
+        delProduct({id:record.id}).then( response => {
+            if(response.code === 200) {
+                message.success(response.msg)
+            }else {
+                message.error(response.msg)
+            }
+        })
+    }
+
     
     getData = () =>{
         this.setState({isLoading:true})

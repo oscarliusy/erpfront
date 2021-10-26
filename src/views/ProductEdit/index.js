@@ -131,7 +131,7 @@ class ProductEdit extends Component {
                 }else{
                     this.setState({isSpin:true})
                     console.log('submit parms:',params)
-                    saveProductEdit(params)          
+                    saveProductEdit(params)
                     .then(resp=>{
                         message.success(resp.msg)
                         this.props.resetProductConstructTable()

@@ -98,8 +98,6 @@ export default class PMRelationship extends Component{
   }
   showDrawer = ()=> {
     postShowMeterialNoneProduct().then(response => {
-      console.log(response[0])
-      console.log(typeof(response))
       this.setState({
         meterial:response,
         visible:true

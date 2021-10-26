@@ -12,13 +12,12 @@ import {
     Input,
     Icon,
     Spin,
-    Modal, message
+    Modal, message,Popconfirm
 } from 'antd'
-import { getInventoryMaterialList,deleteIMItem,getIMtotalNumber } from '../../requests'
+import { getInventoryMaterialList,deleteMaterial,getIMtotalNumber } from '../../requests'
+import { wait } from '@testing-library/dom';
 
-const { confirm } = Modal;
-
-
+const confirmTitle = "确定删除该物料吗？"
 const { Search } = Input
 const titleDisplayMap = {
         id:'编号',
@@ -58,26 +57,7 @@ export default class IMList extends Component {
         
     }
 
-    showConfirm = (record,getData) => {
-        confirm({
-          title: '你确定要删除该物料么？',
-          content: `${record.uniqueId} 数量: ${record.amount}`,
-          onOk() {
-            deleteIMItem(record.id)
-            .then(resp=>{
-                if(resp.status === 'success'){
-                    message.success('已成功删除')
-                    getData() //刷新页面数据，不跳转
-                }else{
-                    message.error('删除失败，请刷新确认')
-                }
-            })
-          },
-          onCancel() {
-            console.log('Cancel');
-          },
-        });
-      }
+    
 
     createColumns = (columnsKeys) =>{
         const columns = columnsKeys.map(item=>{
@@ -115,10 +95,9 @@ export default class IMList extends Component {
               return (
                 <>
                     <Button size="small" type="primary" onClick={this.toEdit.bind(this,record)}>编辑</Button>
-                    <Button  size="small" type="default" disabled
-                        onClick={this.showConfirm.bind(this,record,this.getData)}
-                        style = {{marginLeft:"5px"}} 
-                    >删除</Button>
+                    <Popconfirm placement="topRight" title={confirmTitle} onConfirm={this.confirm.bind(this,record)} okText="Yes" cancelText="No">
+                        <Button size="small" type="link" >删除物料</Button>
+                    </Popconfirm>
                 </>
               )
             }
@@ -128,6 +107,18 @@ export default class IMList extends Component {
 
     toEdit = (record) =>{
         window.open(`#/erp/comm/material/edit/${record.id}`)
+    }
+
+    confirm = (record)=>{
+        deleteMaterial({id:record.id}).then( response => {
+            if(response === "success"){
+                message.success("删除成功")
+                wait(1500)
+                window.location.reload()
+            }else{
+                message.warning(response)
+            }
+        })
     }
 
     getData = () =>{
