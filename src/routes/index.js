@@ -29,7 +29,8 @@ import {
     CrawlerTaskList,
     CrawlerTaskAdd,
     CrawlerTaskDetail,
-    CrawlerBestSellerList
+    CrawlerBestSellerList,
+    NewMaterialUpload
     
 } from '../views'
 
@@ -74,6 +75,13 @@ export const commonRoutes = {
         isNav:true,
         title:'批量入库',
         icon:'car',
+        roles:['001','002','003']
+    },{
+        pathname:'/erp/comm/material/newmaterialupload',
+        component:NewMaterialUpload,
+        isNav:true,
+        title:'批量新建新品',
+        icon:'file-excel',
         roles:['001','002','003']
     },{
         pathname:'/erp/comm/material/update',

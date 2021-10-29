@@ -150,6 +150,11 @@ const InstockUpload = Loadable({
     loading: Loading
 })
 
+const NewMaterialUpload = Loadable({
+    loader: () => import('./NewMaterialUpload'),
+    loading: Loading
+})
+
 const CrawlerTaskList = Loadable({
     loader: () => import('./CrawlerTaskList'),
     loading: Loading
@@ -203,5 +208,6 @@ export {
     CrawlerTaskList,
     CrawlerTaskAdd,
     CrawlerTaskDetail,
-    CrawlerBestSellerList
+    CrawlerBestSellerList,
+    NewMaterialUpload
 }

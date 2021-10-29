@@ -111,6 +111,10 @@ export const postMaterialAdd = (params) =>{
     return serviceKoa.post('/api/v1/material/add',params)
 }
 
+export const postMaterialNewUpload = (params) =>{
+    return serviceKoa.post('/api/v1/material/newUpload',params)
+}
+
 //params={keyword,offset,limited}
 export const instockMaterialSearch = (params) =>{
     return serviceKoa.post('/api/v1/material/search',params)
