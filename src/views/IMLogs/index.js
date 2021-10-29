@@ -89,6 +89,10 @@ export default class IMLogs extends Component {
     onClose = () => {
         this.setState({
           visible: false,
+          currentTab:"tab1",
+          columnsDrawer:[],
+          dataSourceDrawer:[],
+          totalDrawer:[]
         });
     }
 
