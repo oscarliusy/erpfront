@@ -1,9 +1,11 @@
-import { Upload, Button, Icon, Card, message, List } from 'antd'
+import { Upload, Button, Icon, Card, message, List, Select, Modal } from 'antd'
 import React, { Component } from 'react'
 import { readFile } from '../../assets/lib/utils'
 import xlsx from 'xlsx'
 import { INSTOCK_KEYS } from '../../assets/lib/model-constant'
-import { postUploadNewProduct } from '../../requests'
+import { postUploadNewProduct, getPurchaserList } from '../../requests'
+
+const { Option } = Select;
 
 export default class NewMaterialUpload extends Component {
     constructor(props) {
@@ -18,7 +20,12 @@ export default class NewMaterialUpload extends Component {
             isUploadExcelSpin: false,
             reqData: [],
             duplicateProductList: [],
-            duplicateMaterialList: []
+            duplicateMaterialList: [],
+            visible: false,
+            seletcUser: "",
+            instockerList: [],
+            usersList: [],
+
         }
     }
 
@@ -151,26 +158,9 @@ export default class NewMaterialUpload extends Component {
     }
 
     handleSubmit = () => {
-
-        if (this.state.duplicateProductList.length > 0) {
-            message.error(`请重新上传，产品SKU重复，SKU为:${this.state.duplicateProductList}`)
-        } else if (this.state.duplicateProductList.length > 0) {
-            message.error(`请重新上传，产品中含有重复物料，SKU为:${this.state.duplicateMaterialList}`)
-        } else {
-            // TODO: send request to server
-            postUploadNewProduct(this.state.reqData).then(response => {
-                console.log(response)
-                if (!response.productExistInfo.allNewProductNotExist) {
-                    message.error(`以下产品(SKU)已存在:${response.productExistInfo.skuList.toString()}`)
-                } else if (!response.materialExistInfo.allMaterialExist) {
-                    message.error(`以下物料不存在:${response.materialExistInfo.materialNotFindList.toString()}`)
-                }else if (!response.insertResult.success) {
-                    message.error(response.insertResult.message)
-                }else if (!response.insertResult.success) {
-                    message.success(response.insertResult.message)
-                }
-            })
-        }
+        this.setState({
+            visible: true
+        })
     }
 
 
@@ -202,7 +192,70 @@ export default class NewMaterialUpload extends Component {
     }
 
     componentDidMount() {
+        this.initData()
     }
+
+    initData = () => {
+
+        getPurchaserList().then(resp => {
+            let _instockerList = resp.map(item => {
+                return item.name
+            })
+            this.setState({
+                instockerList: _instockerList,
+                usersList: resp
+            })
+        })
+    }
+
+    handleOk = () => {
+        if (this.state.duplicateProductList.length > 0) {
+            message.error(`请重新上传，产品SKU重复，SKU为:${this.state.duplicateProductList}`)
+        } else if (this.state.duplicateProductList.length > 0) {
+            message.error(`请重新上传，产品中含有重复物料，SKU为:${this.state.duplicateMaterialList}`)
+        } else {
+            let data = this.state.reqData
+            let creater_id
+            this.state.usersList.map(item => {
+                if(item.name === this.state.seletcUser){
+                    creater_id = item.id
+                }
+            })
+            for(let i = 0; i < data.length; i++) {
+                data[i].creater_id = creater_id
+            }
+            this.setState({
+                reqData: data
+            })
+            postUploadNewProduct(this.state.reqData).then(response => {
+                if (!response.productExistInfo.allNewProductNotExist) {
+                    message.error(`以下产品(SKU)已存在:${response.productExistInfo.skuList.toString()}`)
+                } else if (!response.materialExistInfo.allMaterialExist) {
+                    message.error(`以下物料不存在:${response.materialExistInfo.materialNotFindList.toString()}`)
+                } else if (!response.insertResult.success) {
+                    message.error(response.insertResult.message)
+                } else if (response.insertResult.success) {
+                    message.success(response.insertResult.message)
+                }
+                this.setState({
+                    visible:false
+                })
+            })
+        }
+    }
+
+    handleCancel = () => {
+        this.setState({
+            visible: false
+        })
+    }
+
+    handleChange =(value) =>{
+        this.setState({
+            seletcUser:value
+        })
+    }
+
 
     render() {
         const { fileList } = this.state
@@ -255,6 +308,17 @@ export default class NewMaterialUpload extends Component {
                         </List.Item>
                     )}
                 />
+                <Modal title="选择上传用户" visible={this.state.visible} onOk={this.handleOk} onCancel={this.handleCancel}>
+                    <Select style={{ width: 120 }} onChange={this.handleChange}>
+                        {
+                            this.state.instockerList.map(item => {
+                                return (
+                                    <Option value={item} key={item}>{item}</Option>
+                                )
+                            })
+                        }
+                    </Select>
+                </Modal>
             </>
         )
     }
