@@ -186,6 +186,10 @@ export const postProductAdd = (params)=>{
     return serviceKoa.post('/api/v1/product/add',params)
 }
 
+export const postUploadNewProduct = (params) =>{
+    return serviceKoa.post('/api/v1/product/upload',params)
+}
+
 export const getPreoutstockList = (offset=0,limited=10) =>{
     return serviceKoa.post('/api/v1/product/preoutstock/list',{
         offset,
@@ -225,6 +229,7 @@ export const postOutstockUpload = (params) =>{
 export const postPreoutstockAdd = (params) =>{
     return serviceKoa.post('/api/v1/product/preoutstock/add',params)
 }
+
 
 export const getProductEditLogs = (offset = 0, limited = 10) =>{
     return serviceKoa.post('/api/v1/product/editlog',{

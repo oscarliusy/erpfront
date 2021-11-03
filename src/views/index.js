@@ -175,6 +175,11 @@ const CrawlerBestSellerList = Loadable({
     loading: Loading
 })
 
+const ProductUploadNew = Loadable({
+    loader: () => import('./ProductUploadNew'),
+    loading: Loading
+})
+
 export {
     SignIn,
     SignUp,
@@ -209,5 +214,6 @@ export {
     CrawlerTaskAdd,
     CrawlerTaskDetail,
     CrawlerBestSellerList,
-    NewMaterialUpload
+    NewMaterialUpload,
+    ProductUploadNew
 }

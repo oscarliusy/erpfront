@@ -30,7 +30,8 @@ import {
     CrawlerTaskAdd,
     CrawlerTaskDetail,
     CrawlerBestSellerList,
-    NewMaterialUpload
+    NewMaterialUpload,
+    ProductUploadNew
     
 } from '../views'
 
@@ -136,6 +137,13 @@ export const commonRoutes = {
         isNav:true,
         title:'批量出库',
         icon:'shopping-cart',
+        roles:['001','002','003']
+     },{
+        pathname:'/erp/comm/product/uploadnewproduct' ,
+        component:ProductUploadNew,
+        isNav:true,
+        title:'批量新建产品',
+        icon:'share-alt',
         roles:['001','002','003']
      },{
         pathname:'/erp/comm/product/edit/:id' ,
