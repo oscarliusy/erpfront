@@ -26,7 +26,8 @@ const titleDisplayMap = {
     childAsin:'(Child)ASIN',
     title:'Title',
     image: 'Image',
-    description:'Description'
+    description:'Description',
+    brandName:`brandName`
 }
 
 export default class ProductList extends Component {
@@ -142,6 +143,7 @@ export default class ProductList extends Component {
         .then(resp=>{
             //console.log(resp)
             const columnsKeys = Object.keys(resp.list[0]).splice(0,7)
+            columnsKeys.push('brandName')
             const colunms = this.createColumns(columnsKeys)
             if(!this.updater.isMounted(this)) return
             this.setState({
