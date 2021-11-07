@@ -149,7 +149,7 @@ class ProductEdit extends Component {
                     })
                     .finally(()=>{
                         this.setState({isSpin:false})
-                        //this.props.history.push('/erp/comm/product/list')
+                        this.props.history.push('/erp/comm/product/list')
                     })
                 }
               }else{
