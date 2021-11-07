@@ -95,6 +95,7 @@ class Edit extends Component {
                 image:this.state.image,
                 userPurchase_id:this.state.userPurchase_id
             })
+            console.log(params)
             postMaterialEdit(params)
             .then(resp=>{
                 //console.log(resp);
@@ -295,6 +296,20 @@ class Edit extends Component {
                                     </div>
                                 </Spin>
                             </Upload>
+                    </Form.Item>
+                    <Form.Item
+                        label="修改原因"
+                    >
+                        {getFieldDecorator('modifyReason', {
+                            rules: [
+                                {
+                                    required:true,
+                                    message:'修改原因必须填写的'
+                                }
+                            ],
+                            })(
+                                <Input  />
+                        )}                        
                     </Form.Item>
                     <Form.Item wrapperCol={{ offset:4 }}>
                         <Button type="primary" htmlType="submit">
