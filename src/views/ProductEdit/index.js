@@ -17,7 +17,7 @@ import axios from 'axios'
 import { saveProductConstructTable,resetProductConstructTable } from '../../actions/productTable'
 import { connect } from 'react-redux'
 import { ProductEditTable } from '../../components'
-import { getProductDetailById,instockMaterialSearch,saveProductEdit } from '../../requests'
+import { getProductDetailById,instockMaterialSearch,saveProductEdit,getPurchaserList } from '../../requests'
 
 const { Search } = Input
 
@@ -66,8 +66,9 @@ class ProductEdit extends Component {
             selectedRowData:[],
             siteList:[],
             siteMap:[],
-            siteDefault:""
-
+            siteDefault:"",
+            instockerList: [],
+            usersList: []
         }
     }
 
@@ -105,6 +106,12 @@ class ProductEdit extends Component {
                 _site_id = item.id
             }
         })
+        let userId
+        this.state.usersList.map(item=>{
+            if(item.name === values.user){
+                userId = item.id
+            }
+        })
 
         params={
             id:values.id,
@@ -116,7 +123,9 @@ class ProductEdit extends Component {
             freightFee:values.freightFee,
             amazonSalePrice:values.amazonSalePrice,
             image:this.state.dataSource.image,
-            materials:_materials
+            materials:_materials,
+            brandName:values.brandName.trim(),
+            user_id:userId
         }
         return {params,productErr}
     }
@@ -130,7 +139,6 @@ class ProductEdit extends Component {
                     message.error(productErr)
                 }else{
                     this.setState({isSpin:true})
-                    console.log('submit parms:',params)
                     saveProductEdit(params)
                     .then(resp=>{
                         message.success(resp.msg)
@@ -140,8 +148,8 @@ class ProductEdit extends Component {
                         console.log(err)
                     })
                     .finally(()=>{
-                        this.setState({isSpin:false})      
-                        this.props.history.push('/erp/comm/product/list')
+                        this.setState({isSpin:false})
+                        //this.props.history.push('/erp/comm/product/list')
                     })
                 }
               }else{
@@ -154,8 +162,18 @@ class ProductEdit extends Component {
         this.setState({
             isSpin:true
         })
+        getPurchaserList().then(resp => {
+            let _instockerList = resp.map(item => {
+                return item.name
+            })
+            this.setState({
+                instockerList: _instockerList,
+                usersList: resp
+            })
+        })
         getProductDetailById(this.props.location.pathname.split('/').pop())
         .then(resp=>{
+            console.log(resp.detail)
             if(!this.updater.isMounted(this)) return
             this.setState({
                 dataSource:resp.detail
@@ -375,7 +393,7 @@ class ProductEdit extends Component {
                             initialValue:this.state.dataSource.id
                             })(
                             <Input readOnly="readOnly" />
-                        )}                        
+                        )}
                     </Form.Item>
                     <Form.Item
                         label="Site"
@@ -446,6 +464,45 @@ class ProductEdit extends Component {
                             })(
                             <Input />
                         )}                        
+                    </Form.Item>
+                    <Form.Item
+                        label="BrandName"
+                    >
+                        {getFieldDecorator('brandName', {
+                            rules: [
+                                {
+                                    required:true,
+                                    message:'BrandName是必须填写的，否则填写未知'
+                                }
+                            ],
+                            initialValue:this.state.dataSource.brandName
+                            })(
+                            <Input />
+                        )}                        
+                    </Form.Item>
+                    <Form.Item
+                        label="编辑用户"
+                        >
+                        {getFieldDecorator('user', {
+                            rules: [
+                                {
+                                    required:true,
+                                    message:'编辑用户是必须填写的'
+                                }
+                            ],
+                            })(
+                                <Select 
+                                style={{ width: 200 }} 
+                            >
+                                {
+                                    this.state.instockerList.map(item=>{
+                                        return(
+                                            <Option value={item} key={item}>{item}</Option>
+                                        )
+                                    })
+                                }
+                            </Select>
+                        )} 
                     </Form.Item>
                     <Form.Item
                         label="Purchase Price(￥)"
