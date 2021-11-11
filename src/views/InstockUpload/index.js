@@ -72,7 +72,7 @@ class InstockUpload extends Component {
         })
         //读取excel数据,变为json格式
         let data = await readFile(file)
-        let workbook = xlsx.read(data,{type:'binary'})     
+        let workbook = xlsx.read(data,{type:'binary'})
         let worksheet = workbook.Sheets[workbook.SheetNames[0]]//取出第一个表中的数据
         data = xlsx.utils.sheet_to_json(worksheet) //使用内置工具转化为json
         this.setState({
@@ -218,8 +218,12 @@ class InstockUpload extends Component {
                     this.setState({isSubmitSpin:true})
                     instockMaterialPost(params)          
                     .then(resp=>{
-                        message.success(resp.msg)
-                        this.props.history.push('/erp/comm/material/list')
+                        if(resp.msg.success){
+                            message.success(resp.msg.data)
+                        }else{
+                            message.error(resp.msg.data)
+                        }
+                        //this.props.history.push('/erp/comm/material/list')
                     })
                     .catch(err=>{
                         console.log(err)
@@ -228,7 +232,6 @@ class InstockUpload extends Component {
                         this.setState({isSubmitSpin:false})
                     })
                 }
-                
             }else{
             message.error('请检查必填项和入库项是否填写正确')
           }
@@ -261,7 +264,6 @@ class InstockUpload extends Component {
             instockErr = '未添加入库EXCEL文件'
             return instockErr
         }
-
         this.state.submitInstockList.forEach(item=>{
             if(item.instockAmount === 0 || !Boolean(Number(item.instockAmount))){
                 instockErr='入库项数量有误，请检查'  
