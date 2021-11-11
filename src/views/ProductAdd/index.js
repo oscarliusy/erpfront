@@ -142,6 +142,7 @@ class ProductAdd extends Component {
         params.site_id = _site_id
         //这里本应该从登录信息获取id,暂时伪造一个数据
         params.creater_id = 1
+        params.brandName = values.brandName.trim()
         return {params,productErr}
     }
 
@@ -157,14 +158,14 @@ class ProductAdd extends Component {
                     this.setState({isSpin:true})
                     postProductAdd(params)          
                     .then(resp=>{
-                        if(resp.status === 'succeed'){
+                        if(resp.success){
                             message.success(resp.msg)
                             this.props.resetProductConstructTable()
                             setTimeout(()=>{
                                 this.props.history.push('/erp/comm/product/list')
                             },1000)
                         }
-                        else if(resp.status === 'failed'){
+                        else if(!resp.status){
                             message.warning(resp.msg)
                         } 
                     })
@@ -379,6 +380,18 @@ class ProductAdd extends Component {
                                     {
                                         required:true,
                                         message:'title是必须填写的'
+                                    }
+                                ],                              
+                                })(
+                                <Input />
+                            )}                        
+                        </Form.Item>
+                        <Form.Item label="brandName"  >
+                            {getFieldDecorator('brandName', {
+                                rules: [
+                                    {
+                                        required:true,
+                                        message:'品牌是必须填写的，否则请填写：未知'
                                     }
                                 ],                              
                                 })(
