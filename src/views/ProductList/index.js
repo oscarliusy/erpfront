@@ -128,7 +128,7 @@ export default class ProductList extends Component {
 
     confirm = (record)=>{
         delProduct({id:record.id}).then( response => {
-            if(response.code === 200) {
+            if(response.success) {
                 message.success(response.msg)
             }else {
                 message.error(response.msg)
