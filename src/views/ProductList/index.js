@@ -130,6 +130,9 @@ export default class ProductList extends Component {
         delProduct({id:record.id}).then( response => {
             if(response.success) {
                 message.success(response.msg)
+                setTimeout(()=>{
+                    this.props.history.push('/erp/comm/product/list')
+                },1000)
             }else {
                 message.error(response.msg)
             }
