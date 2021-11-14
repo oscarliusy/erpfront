@@ -144,8 +144,6 @@ export default class ProductLogs extends Component {
                   return (
                       <div>
                           <Button size="small" type="primary" onClick={this.toOutstockDetail.bind(this,record)} >查看详情</Button>
-                            &nbsp;&nbsp;
-                          <Button size="small" type="primary" onClick={this.toOutstockDetail.bind(this,record)} >查看库存为负详情</Button>
                       </div>
                   );
                 }
