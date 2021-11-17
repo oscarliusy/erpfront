@@ -101,11 +101,8 @@ export default class PMRelationship extends Component {
     title[1]["children"] = children
   }
   onSearch = (value) => {
-    this.setState({
-      pageNum: 1,
-      pageSize: 10
-    })
-    let searchItem = { item: value, pageSize: this.state.pageSize, pageNum: this.state.pageNum }
+    this.onShowSizeChange(1,10)
+    let searchItem = { item: value, offset: this.state.offset, limited: this.state.limited }
     postSearchProductRelation(searchItem).then(response => {
       this.createColumns(response.data)
       console.log(response.total)
