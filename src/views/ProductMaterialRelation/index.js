@@ -52,26 +52,18 @@ export default class PMRelationship extends Component {
       meterialKeys: [],
       pageSize: 10,
       pageNum: 1,
-      total: 0
+      total: 0,
+      offset: 0,
+      limited: 10,
     };
   }
-
-  // paginationProps = {
-  //   showSizeChanger: true,//设置每页显示数据条数
-  //   showQuickJumper: true,
-  //   onChange: (current) => this.onChange(current), //点击当前页码
-  //   onShowSizeChange: (current, pageSize) => {//设置每页显示数据条数，current表示当前页码，pageSize表示每页展示数据条数
-  //     this.onShowSizeChange(current, pageSize)
-  //   },
-  //   pageNum:this.state.pageNum
-  // }
 
   componentDidMount() {
     this.getProductList()
   }
 
   getProductList = async () => {
-    postProductRelation({ pageSize: this.state.pageSize, pageNum: this.state.pageNum }).then(response => {
+    postProductRelation({ offset: this.state.offset, limited: this.state.limited }).then(response => {
       this.createColumns(response.data)
       this.setState({
         dataSource: response.data,
@@ -110,14 +102,17 @@ export default class PMRelationship extends Component {
   }
   onSearch = (value) => {
     this.setState({
-      pageNum: 1
+      pageNum: 1,
+      pageSize: 10
     })
     let searchItem = { item: value, pageSize: this.state.pageSize, pageNum: this.state.pageNum }
     postSearchProductRelation(searchItem).then(response => {
-      this.createColumns(response)
+      this.createColumns(response.data)
+      console.log(response.total)
       this.setState({
-        dataSource: response,
+        dataSource: response.data,
         columns: title,
+        total: response.total
       });
     })
   }
@@ -139,12 +134,13 @@ export default class PMRelationship extends Component {
     if (current <= 0) {
       current = 1
     }
+
     await this.setState({
       pageSize: pageSize,
-      pageNum: current
+      pageNum: current,
+      offset: pageSize * (current - 1),
+      limited: pageSize
     })
-    console.log(this.state.pageSize)
-    console.log(this.state.pageNum)
     this.getProductList()
   }
 
@@ -154,15 +150,16 @@ export default class PMRelationship extends Component {
         <Search placeholder="输入SKU或者description" enterButton="Search" size="large" style={{ width: 600 }} onSearch={value => this.onSearch(value)} />
         <Button type="primary" size="large" style={{ float: "right" }} onClick={this.showDrawer} >查看孤品物料</Button>
         <br /><br />
-        <Table columns={this.state.columns} dataSource={this.state.dataSource} bordered pagination={false} />
-        <br />
-        <Pagination
-          onChange={(current, pageSize) => this.onShowSizeChange(current, pageSize)}
-          onShowSizeChange={(current, pageSize) => this.onShowSizeChange(current, pageSize)}
-          total={this.state.total}
-          showQuickJumper={true}
-          showSizeChanger
-          defaultCurrent={this.state.pageNum} />
+        <Table columns={this.state.columns} dataSource={this.state.dataSource} bordered
+          pagination={{
+            total: this.state.total,
+            onChange: this.onShowSizeChange,
+            showQuickJumper: true,
+            onShowSizeChange: this.onShowSizeChange,
+            showSizeChanger: true,
+            current: this.state.offset / this.state.limited + 1
+          }}
+        />
         <Drawer title="孤品物料" placement="right" onClose={this.onClose} destroyOnClose={true} visible={this.state.visible} width="40%">
           <Table columns={meterialColumns} dataSource={this.state.meterial} bordered />
         </Drawer>
