@@ -1,32 +1,33 @@
-import { Table,Input,Card,Drawer,Button } from 'antd';
+import { Table, Input, Card, Drawer, Button, Pagination } from 'antd';
 import React, { Component } from 'react'
-import { postProductRelation,postSearchProductRelation,postShowMeterialNoneProduct } from '../../requests'
+import { postProductRelation, postSearchProductRelation, postShowMeterialNoneProduct } from '../../requests'
 const { Search } = Input;
 
-const title =[{
-    title: '产品信息',
-    children: [
-        {
-          title: 'id',
-          dataIndex: 'id',
-          key: 'id',
-        },
-        {
-          title: 'sku',
-          dataIndex: 'sku',
-          key: 'sku',
-        }, 
-        {
-          title: 'description',
-          dataIndex: 'description',
-          key: 'description',
-        },
-      ],
-    },{
-      title: '物料信息',
-      children: [
-      ]
-    }
+
+const title = [{
+  title: '产品信息',
+  children: [
+    {
+      title: 'id',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
+      title: 'sku',
+      dataIndex: 'sku',
+      key: 'sku',
+    },
+    {
+      title: 'description',
+      dataIndex: 'description',
+      key: 'description',
+    },
+  ],
+}, {
+  title: '物料信息',
+  children: [
+  ]
+}
 ]
 const meterialColumns = [
   {
@@ -41,41 +42,62 @@ const meterialColumns = [
   },
 ]
 
-export default class PMRelationship extends Component{
-  constructor(props){
+export default class PMRelationship extends Component {
+  constructor(props) {
     super(props)
     this.state = {
-      dataSource:[],
-      meterial:[],
-      visible:false,
-      meterialKeys:[]
+      dataSource: [],
+      meterial: [],
+      visible: false,
+      meterialKeys: [],
+      pageSize: 10,
+      pageNum: 1,
+      total: 0
     };
   }
-  componentDidMount(){
-    postProductRelation().then(response=>{
-      this.createColumns(response)
+
+  // paginationProps = {
+  //   showSizeChanger: true,//设置每页显示数据条数
+  //   showQuickJumper: true,
+  //   onChange: (current) => this.onChange(current), //点击当前页码
+  //   onShowSizeChange: (current, pageSize) => {//设置每页显示数据条数，current表示当前页码，pageSize表示每页展示数据条数
+  //     this.onShowSizeChange(current, pageSize)
+  //   },
+  //   pageNum:this.state.pageNum
+  // }
+
+  componentDidMount() {
+    this.getProductList()
+  }
+
+  getProductList = async () => {
+    postProductRelation({ pageSize: this.state.pageSize, pageNum: this.state.pageNum }).then(response => {
+      this.createColumns(response.data)
       this.setState({
-        dataSource:response,
-        columns:title,
+        dataSource: response.data,
+        columns: title,
+        total: response.total,
       });
     })
   }
+
+
   createColumns = (response) => {
     let count = 1
-    if(response.length === 0) {
+    if (response.length === 0) {
       return
     }
     let keys = Object.keys(response[0])
     let children = []
-    for(let i = 3; i < keys.length; i=i+2,count++){
+    for (let i = 3; i < keys.length; i = i + 2, count++) {
       let meterialInfo = {}
       let singletonChildren = []
       let uniqInfo = {}
       let amountInfo = {}
-      uniqInfo["title"] ="唯一识别码"
+      uniqInfo["title"] = "唯一识别码"
       uniqInfo["dataIndex"] = `uniqueId${count}`
       uniqInfo["key"] = `uniqueId${count}`
-      amountInfo["title"] ="所需数量"
+      amountInfo["title"] = "所需数量"
       amountInfo["dataIndex"] = `pmAmount${count}`
       amountInfo["key"] = `pmAmount${count}`
       singletonChildren.push(uniqInfo)
@@ -87,20 +109,23 @@ export default class PMRelationship extends Component{
     title[1]["children"] = children
   }
   onSearch = (value) => {
-    let searchItem = {item: value}    
-    postSearchProductRelation(searchItem).then(response =>{
+    this.setState({
+      pageNum: 1
+    })
+    let searchItem = { item: value, pageSize: this.state.pageSize, pageNum: this.state.pageNum }
+    postSearchProductRelation(searchItem).then(response => {
       this.createColumns(response)
       this.setState({
-        dataSource:response,
-        columns:title,
+        dataSource: response,
+        columns: title,
       });
     })
   }
-  showDrawer = ()=> {
+  showDrawer = () => {
     postShowMeterialNoneProduct().then(response => {
       this.setState({
-        meterial:response,
-        visible:true
+        meterial: response,
+        visible: true
       })
     })
   }
@@ -110,17 +135,38 @@ export default class PMRelationship extends Component{
     });
   };
 
-  render(){
-        return (
-            <Card title="产品物料关系">
-            <Search placeholder="输入SKU或者description" enterButton="Search" size="large" style={{ width: 600 }} onSearch={value => this.onSearch(value)} />
-            <Button type="primary" size = "large" style={{float:"right"}} onClick={this.showDrawer} >查看孤品物料</Button>
-              <br/><br/>
-            <Table columns={this.state.columns} dataSource={this.state.dataSource} bordered pagination={{showQuickJumper:true} } />
-            <Drawer title="孤品物料" placement="right" onClose={this.onClose} destroyOnClose={true} visible={this.state.visible} width="40%">
-              <Table columns={meterialColumns} dataSource={this.state.meterial} bordered />
-            </Drawer>
-            </Card>
-        )
+  onShowSizeChange = async (current, pageSize) => {
+    if (current <= 0) {
+      current = 1
+    }
+    await this.setState({
+      pageSize: pageSize,
+      pageNum: current
+    })
+    console.log(this.state.pageSize)
+    console.log(this.state.pageNum)
+    this.getProductList()
+  }
+
+  render() {
+    return (
+      <Card title="产品物料关系">
+        <Search placeholder="输入SKU或者description" enterButton="Search" size="large" style={{ width: 600 }} onSearch={value => this.onSearch(value)} />
+        <Button type="primary" size="large" style={{ float: "right" }} onClick={this.showDrawer} >查看孤品物料</Button>
+        <br /><br />
+        <Table columns={this.state.columns} dataSource={this.state.dataSource} bordered pagination={false} />
+        <br />
+        <Pagination
+          onChange={(current, pageSize) => this.onShowSizeChange(current, pageSize)}
+          onShowSizeChange={(current, pageSize) => this.onShowSizeChange(current, pageSize)}
+          total={this.state.total}
+          showQuickJumper={true}
+          showSizeChanger
+          defaultCurrent={this.state.pageNum} />
+        <Drawer title="孤品物料" placement="right" onClose={this.onClose} destroyOnClose={true} visible={this.state.visible} width="40%">
+          <Table columns={meterialColumns} dataSource={this.state.meterial} bordered />
+        </Drawer>
+      </Card>
+    )
   }
 }

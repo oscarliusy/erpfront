@@ -166,8 +166,8 @@ export const  delProduct = (params)=>{
     return  serviceKoa.post('/api/v1/product/delete',params)
 }
 
-export const postProductRelation = () =>{
-    return serviceKoa.post('/api/v1/product/pmrelation/list')
+export const postProductRelation = (params) =>{
+    return serviceKoa.post('/api/v1/product/pmrelation/list',params)
 }
 
 export const postSearchProductRelation = (params) =>{
