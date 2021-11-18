@@ -59,17 +59,14 @@ export default class PMRelationship extends Component {
   }
 
   componentDidMount() {
+    console.log('componentDidMount')
     this.getProductList()
   }
 
   getProductList = async () => {
     postProductRelation({ offset: this.state.offset, limited: this.state.limited }).then(response => {
       this.createColumns(response.data)
-      this.setState({
-        dataSource: response.data,
-        columns: title,
-        total: response.total,
-      });
+      this.syncData(response)
     })
   }
 
@@ -100,12 +97,18 @@ export default class PMRelationship extends Component {
     }
     title[1]["children"] = children
   }
-  onSearch = (value) => {
+  onSearch = async (value) => {
+    //存在bug
     this.onShowSizeChange(1,10)
     let searchItem = { item: value, offset: this.state.offset, limited: this.state.limited }
     postSearchProductRelation(searchItem).then(response => {
       this.createColumns(response.data)
-      await this.setState({
+      this.syncData(response)
+    })
+  }
+  syncData = async (response) => {
+    setTimeout(() => {
+      this.setState({
         dataSource: response.data,
         columns: title,
         total: response.total
