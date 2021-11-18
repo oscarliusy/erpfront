@@ -167,10 +167,11 @@ export default class NewMaterialUpload extends Component {
 
     buildData(data) {
         let res = {}
-        res.sku = data["产品SKU"]
+        res.sku = data["产品SKU"].trim()
         res.title = data["title"].trim()
         res.description = data["description"].trim()
         res.site = data["site"].trim()
+        res.brandName = data["品牌"].trim()
         res.materialList = []
         let idx = 1
         let cur = {
@@ -217,11 +218,11 @@ export default class NewMaterialUpload extends Component {
             let data = this.state.reqData
             let creater_id
             this.state.usersList.map(item => {
-                if(item.name === this.state.seletcUser){
+                if (item.name === this.state.seletcUser) {
                     creater_id = item.id
                 }
             })
-            for(let i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
                 data[i].creater_id = creater_id
             }
             this.setState({
@@ -232,13 +233,15 @@ export default class NewMaterialUpload extends Component {
                     message.error(`以下产品(SKU)已存在:${response.productExistInfo.skuList.toString()}`)
                 } else if (!response.materialExistInfo.allMaterialExist) {
                     message.error(`以下物料不存在:${response.materialExistInfo.materialNotFindList.toString()}`)
+                } else if (!response.brandExistInfo.allBrandExist) {
+                    message.error(`以下品牌不存在:${response.brandExistInfo.brandNotFound.toString()}`)
                 } else if (!response.insertResult.success) {
                     message.error(response.insertResult.message)
                 } else if (response.insertResult.success) {
                     message.success(response.insertResult.message)
                 }
                 this.setState({
-                    visible:false
+                    visible: false
                 })
             })
         }
@@ -250,9 +253,9 @@ export default class NewMaterialUpload extends Component {
         })
     }
 
-    handleChange =(value) =>{
+    handleChange = (value) => {
         this.setState({
-            seletcUser:value
+            seletcUser: value
         })
     }
 
@@ -300,7 +303,7 @@ export default class NewMaterialUpload extends Component {
                     renderItem={item => (
                         <List.Item>
                             <List.Item.Meta
-                                title={"产品SKU：" + item.sku}
+                                title={"产品SKU：" + item.sku + " 品牌：" + item.brandName}
                                 description={"物料：" + item.materialList.map(item => (
                                     item.uniqueId + ": " + item.materialAmount + "个"
                                 ))}
