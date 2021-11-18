@@ -105,8 +105,7 @@ export default class PMRelationship extends Component {
     let searchItem = { item: value, offset: this.state.offset, limited: this.state.limited }
     postSearchProductRelation(searchItem).then(response => {
       this.createColumns(response.data)
-      console.log(response.total)
-      this.setState({
+      await this.setState({
         dataSource: response.data,
         columns: title,
         total: response.total
