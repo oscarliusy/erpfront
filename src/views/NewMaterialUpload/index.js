@@ -161,8 +161,8 @@ export default class NewMaterialUpload extends Component{
 
     buildData(data) {
         let res = {}
-        res.uniqueId = data["唯一识别码"]
-        res.description = data["备注"]
+        res.uniqueId = (data["唯一识别码"]+"").trim()
+        res.description = (data["备注"]+"").trim()
         res.amount = data["入库数量"]
         res.price = data["采购价"]
         return res

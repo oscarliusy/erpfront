@@ -167,11 +167,11 @@ export default class NewMaterialUpload extends Component {
 
     buildData(data) {
         let res = {}
-        res.sku = data["产品SKU"].trim()
-        res.title = data["title"].trim()
-        res.description = data["description"].trim()
-        res.site = data["site"].trim()
-        res.brandName = data["品牌"].trim()
+        res.sku = (data["产品SKU"]+"").trim()
+        res.title = (data["title"]+"").trim()
+        res.description = (data["description"]+"").trim()
+        res.site = (data["site"]+"").trim()
+        res.brandName = (data["品牌"]+"").trim()
         res.materialList = []
         let idx = 1
         let cur = {
