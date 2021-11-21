@@ -59,7 +59,6 @@ export default class PMRelationship extends Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount')
     this.getProductList()
   }
 
@@ -98,8 +97,13 @@ export default class PMRelationship extends Component {
     title[1]["children"] = children
   }
   onSearch = async (value) => {
-    //存在bug
-    this.onShowSizeChange(1,10)
+    let current = 1, pageSize = 10
+    await this.setState({
+      pageSize: pageSize,
+      pageNum: current,
+      offset: pageSize * (current - 1),
+      limited: pageSize
+    })
     let searchItem = { item: value, offset: this.state.offset, limited: this.state.limited }
     postSearchProductRelation(searchItem).then(response => {
       this.createColumns(response.data)
@@ -133,7 +137,6 @@ export default class PMRelationship extends Component {
     if (current <= 0) {
       current = 1
     }
-
     await this.setState({
       pageSize: pageSize,
       pageNum: current,
