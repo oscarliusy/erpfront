@@ -134,7 +134,7 @@ export default class NewMaterialUpload extends Component {
         let hasEmpty = false
         this.state.dataSource.map(item => {
             let cur = this.buildData(item)
-            if (item.uniqueId === undefined || item.description || item.amount === undefined || item.price === undefined) {
+            if (cur.uniqueId === 'undefined' || cur.description === 'undefined' || cur.amount === 'undefined' || cur.price === 'undefined') {
                 hasEmpty = true
             }
             if (map.get(cur.uniqueId) === undefined) {
