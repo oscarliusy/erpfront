@@ -237,10 +237,11 @@ export default class NewMaterialUpload extends Component {
                     message.error(`以下品牌不存在:${response.brandExistInfo.brandNotFound.toString()}`)
                 } else if (!response.siteExistInfo.allSitesExist) {
                     message.error(`以下站点不存在:${response.siteExistInfo.siteNotFound.toString()}`)
-                } else if (!response.amountInfo.amountNInt){
+                } else if (!response.amountInfo.amountNInt) {
                     message.error(`以下sku中的物料数量不是正整数:${response.amountInfo.illegalSku.toString()}`)
-                }
-                else if (!response.insertResult.success) {
+                } else if (response.emptyInfo.hasEmpty) {
+                    message.error(`检查Excel表，SKU、title、title存在空(undefined)`)
+                } else if (!response.insertResult.success) {
                     message.error(response.insertResult.message)
                 }
                 this.setState({
