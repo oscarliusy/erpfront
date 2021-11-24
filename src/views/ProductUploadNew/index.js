@@ -167,11 +167,11 @@ export default class NewMaterialUpload extends Component {
 
     buildData(data) {
         let res = {}
-        res.sku = (data["产品SKU"]+"").trim()
-        res.title = (data["title"]+"").trim()
-        res.description = (data["description"]+"").trim()
-        res.site = (data["site"]+"").trim()
-        res.brandName = (data["品牌"]+"").trim()
+        res.sku = (data["产品SKU"] + "").trim()
+        res.title = (data["title"] + "").trim()
+        res.description = (data["description"] + "").trim()
+        res.site = (data["site"] + "").trim()
+        res.brandName = (data["品牌"] + "").trim()
         res.materialList = []
         let idx = 1
         let cur = {
@@ -230,15 +230,18 @@ export default class NewMaterialUpload extends Component {
             })
             postUploadNewProduct(this.state.reqData).then(response => {
                 if (!response.productExistInfo.allNewProductNotExist) {
-                    message.error(`以下产品(SKU)已存在:${response.productExistInfo.skuList.toString()}`)
+                    message.error(`以下产品(SKU)已存在(sku重复或大小写已存在):${response.productExistInfo.upOrLowCase.toString()}`)
                 } else if (!response.materialExistInfo.allMaterialExist) {
                     message.error(`以下物料不存在:${response.materialExistInfo.materialNotFindList.toString()}`)
                 } else if (!response.brandExistInfo.allBrandExist) {
                     message.error(`以下品牌不存在:${response.brandExistInfo.brandNotFound.toString()}`)
-                } else if (!response.insertResult.success) {
+                } else if (!response.siteExistInfo.allSitesExist) {
+                    message.error(`以下站点不存在:${response.siteExistInfo.siteNotFound.toString()}`)
+                } else if (!response.amountInfo.amountNInt){
+                    message.error(`以下sku中的物料数量不是正整数:${response.amountInfo.illegalSku.toString()}`)
+                }
+                else if (!response.insertResult.success) {
                     message.error(response.insertResult.message)
-                } else if (response.insertResult.success) {
-                    message.success(response.insertResult.message)
                 }
                 this.setState({
                     visible: false
