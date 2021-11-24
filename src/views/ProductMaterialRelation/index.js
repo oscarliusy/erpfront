@@ -1,6 +1,6 @@
 import { Table, Input, Card, Drawer, Button, Pagination } from 'antd';
 import React, { Component } from 'react'
-import { postProductRelation, postSearchProductRelation, postShowMeterialNoneProduct } from '../../requests'
+import {  postSearchProductRelation, postShowMeterialNoneProduct } from '../../requests'
 const { Search } = Input;
 
 
@@ -55,18 +55,12 @@ export default class PMRelationship extends Component {
       total: 0,
       offset: 0,
       limited: 10,
+      searchVal: ''
     };
   }
 
   componentDidMount() {
-    this.getProductList()
-  }
-
-  getProductList = async () => {
-    postProductRelation({ offset: this.state.offset, limited: this.state.limited }).then(response => {
-      this.createColumns(response.data)
-      this.syncData(response)
-    })
+    this.getRelationship()
   }
 
 
@@ -102,13 +96,10 @@ export default class PMRelationship extends Component {
       pageSize: pageSize,
       pageNum: current,
       offset: pageSize * (current - 1),
-      limited: pageSize
+      limited: pageSize,
+      searchVal: value
     })
-    let searchItem = { item: value, offset: this.state.offset, limited: this.state.limited }
-    postSearchProductRelation(searchItem).then(response => {
-      this.createColumns(response.data)
-      this.syncData(response)
-    })
+    await this.getRelationship()
   }
   syncData = async (response) => {
     setTimeout(() => {
@@ -143,7 +134,15 @@ export default class PMRelationship extends Component {
       offset: pageSize * (current - 1),
       limited: pageSize
     })
-    this.getProductList()
+    await this.getRelationship()
+  }
+
+  getRelationship = async () => {
+    let searchItem = { item: this.state.searchVal, offset: this.state.offset, limited: this.state.limited }
+      postSearchProductRelation(searchItem).then(response => {
+        this.createColumns(response.data)
+        this.syncData(response)
+      })
   }
 
   render() {
