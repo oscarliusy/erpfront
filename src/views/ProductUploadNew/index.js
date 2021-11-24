@@ -137,10 +137,14 @@ export default class NewMaterialUpload extends Component {
         let duplicateMaterialList = []
         this.state.dataSource.map(item => {
             let cur = this.buildData(item)
-            let materialSet = new Set(cur.materialList)
+            let materialSet = new Set()
+            cur.materialList.map(material =>{
+                materialSet.add(material.uniqueId)
+            })
             if (materialSet.size !== cur.materialList.length) {
                 duplicateMaterialList.push(cur.sku)
             }
+            console.log(duplicateMaterialList)
             if (productMap.get(cur.sku) === undefined) {
                 let sku = cur.sku
                 cur.sku = sku.trim()
@@ -212,8 +216,8 @@ export default class NewMaterialUpload extends Component {
     handleOk = () => {
         if (this.state.duplicateProductList.length > 0) {
             message.error(`请重新上传，产品SKU重复，SKU为:${this.state.duplicateProductList}`)
-        } else if (this.state.duplicateProductList.length > 0) {
-            message.error(`请重新上传，产品中含有重复物料，SKU为:${this.state.duplicateMaterialList}`)
+        } else if (this.state.duplicateMaterialList.length > 0) {
+            message.error(`请重新上传，产品${this.state.duplicateMaterialList.toString()}中含有重复物料`)
         } else {
             let data = this.state.reqData
             let creater_id
