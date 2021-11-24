@@ -46,7 +46,6 @@ export default class NewMaterialUpload extends Component {
         //构造呈现的data和向后端传递的data
         this.buildTableData(data)
         this.buildSubmitInstockList(data)
-
     }
 
     buildTableData = () => {
@@ -131,20 +130,26 @@ export default class NewMaterialUpload extends Component {
     handleSubmit = () => {
         let data = []
         let map = new Map()
-        let errList = []
+        let reqpeatList = []
+        let hasEmpty = false
         this.state.dataSource.map(item => {
             let cur = this.buildData(item)
+            if (item.uniqueId === undefined || item.description || item.amount === undefined || item.price === undefined) {
+                hasEmpty = true
+            }
             if (map.get(cur.uniqueId) === undefined) {
                 let uniqueId = cur.uniqueId
                 cur.uniqueId = uniqueId.trim()
                 map.set(cur.uniqueId, 1)
                 data.push(cur)
             } else {
-                errList.push(cur.uniqueId.toString())
+                reqpeatList.push(cur.uniqueId.toString())
             }
         })
-        if (errList.length > 0) {
-            message.error(`含有重复项，唯一识别码为:${errList}`)
+        if (reqpeatList.length > 0) {
+            message.error(`含有重复项，唯一识别码为:${reqpeatList}`)
+        } else if (hasEmpty) {
+            message.error(`表格中存在未填项`)
         } else {
             this.setState({
                 reqData: data,
