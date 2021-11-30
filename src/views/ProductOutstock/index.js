@@ -22,6 +22,8 @@ import { getPurchaserList, postOutstockUpload } from '../../requests'
 import './outstockupload.less'
 
 const { Option } = Select
+const columns = ["站点","sku","出库数量"]
+
 
 const formLayout = {
     labelCol: {
@@ -102,6 +104,7 @@ class ProductOutstock extends Component {
         })
         this.buildTableData()
         this.buildSubmitOutstockList()
+
     }
 
     buildTableData = () => {
@@ -141,9 +144,13 @@ class ProductOutstock extends Component {
 
     buildSubmitOutstockList = () => {
         let arr = []
+        let status = true
         this.state.excelOriginalData.forEach(item => {
             let obj = {}
             for (let key in OUTSTOCK_KEYS) {
+                if(item.key===undefined){
+                    status = false
+                }
                 if (!OUTSTOCK_KEYS.hasOwnProperty(key)) break
                 let keyConfig = OUTSTOCK_KEYS[key],
                     text = keyConfig.text,
@@ -154,12 +161,16 @@ class ProductOutstock extends Component {
             }
             arr.push(obj)
         })
-        this.setState({
-            submitOutstockList: arr,
-            isUploadExcelSpin: false
-        })
+        if(status){
+            this.setState({
+                submitOutstockList: arr,
+                isUploadExcelSpin: false
+            })
+        }else{
+            message.error("列缺失，请检查")
+        }
     }
-
+    
     typeTransform = (value, type) => {
         switch (type) {
             case "string":
