@@ -27,7 +27,10 @@ export default class NewMaterialUpload extends Component {
             seletcUser: "",
             instockerList: [],
             usersList: [],
-            hasError: false
+            hasError: false,
+            modelVisible: false,
+            modelTitle:"",
+            modelContent:""
         }
     }
 
@@ -115,9 +118,6 @@ export default class NewMaterialUpload extends Component {
                     status = false
                 }
             }
-            console.log(productColumns.length)
-            console.log((materialIndex - 1) * 2)
-            console.log(Object.keys(product))
             if ((productColumns.length + (materialIndex - 1) * 2) != keysCount && status) {
                 message.error(`格式有误`)
                 status = false
@@ -275,23 +275,40 @@ export default class NewMaterialUpload extends Component {
                 reqData: data
             })
             postUploadNewProduct(this.state.reqData).then(response => {
-                console.log(response)
+                let modelTitle = ""
+                let content = ""
                 if (!response.productExistInfo.allNewProductNotExist) {
-                    message.error(`以下产品(SKU)已存在:${response.productExistInfo.reapeatSku.toString()}`)
+                    modelTitle = "以下产品(SKU)已存在"
+                    content = response.productExistInfo.reapeatSku.toString()
+                    //message.error(`以下产品(SKU)已存在:${response.productExistInfo.reapeatSku.toString()}`)
                 } else if (!response.materialExistInfo.allMaterialExist) {
-                    message.error(`以下物料不存在:${response.materialExistInfo.materialNotFindList.toString()}`)
+                    modelTitle = "以下物料不存在"
+                    content = response.materialExistInfo.materialNotFindList.toString()
+                    //message.error(`以下物料不存在:${response.materialExistInfo.materialNotFindList.toString()}`)
                 } else if (!response.brandExistInfo.allBrandExist) {
-                    message.error(`以下品牌不存在:${response.brandExistInfo.brandNotFound.toString()}`)
+                    modelTitle = "以下品牌不存在"
+                    content = response.brandExistInfo.brandNotFound.toString()
+
+                    //message.error(`以下品牌不存在:${response.brandExistInfo.brandNotFound.toString()}`)
                 } else if (!response.siteExistInfo.allSitesExist) {
-                    message.error(`以下站点不存在:${response.siteExistInfo.siteNotFound.toString()}`)
+                    modelTitle = "以下站点不存在"
+                    content = response.siteExistInfo.siteNotFound.toString()
+
+                    //essage.error(`以下站点不存在:${response.siteExistInfo.siteNotFound.toString()}`)
                 } else if (!response.amountInfo.amountAllInt) {
-                    message.error(`以下sku中的物料数量不是正整数:${response.amountInfo.illegalSku.toString()}`)
+                    modelTitle = "以下sku中的物料数量不是正整数"
+                    content = response.amountInfo.illegalSku.toString()
+
+                    //message.error(`以下sku中的物料数量不是正整数:${response.amountInfo.illegalSku.toString()}`)
                 } else if (response.emptyInfo.hasEmpty) {
                     message.error(`检查Excel表，SKU、title、title存在空(undefined)`)
                 } else if (response.insertResult.success) {
                     message.success(response.insertResult.message)
                 }
                 this.setState({
+                    modelTitle:modelTitle,
+                    modelContent:content,
+                    modelVisible:true,
                     visible: false
                 })
             })
@@ -307,6 +324,12 @@ export default class NewMaterialUpload extends Component {
     handleChange = (value) => {
         this.setState({
             seletcUser: value
+        })
+    }
+
+    closeModal = () => {
+        this.setState({
+            modelVisible:false
         })
     }
 
@@ -372,6 +395,14 @@ export default class NewMaterialUpload extends Component {
                             })
                         }
                     </Select>
+                </Modal>
+                <Modal
+                    title={this.state.modelTitle}
+                    visible={this.state.modelVisible}
+                    onOk={this.closeModal}
+                    onCancel={this.closeModal}
+                >
+                    <p>{this.state.modelContent}</p>
                 </Modal>
             </>
         )
