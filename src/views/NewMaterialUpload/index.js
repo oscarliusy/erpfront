@@ -1,4 +1,4 @@
-import { Upload, Button, Icon, Card, message, Table, Select, Modal, notification } from 'antd'
+import { Upload, Button, Icon, Card, message, Table, Select, Modal } from 'antd'
 import React, { Component } from 'react'
 import { readFile } from '../../assets/lib/utils'
 import xlsx from 'xlsx'
@@ -207,14 +207,14 @@ export default class NewMaterialUpload extends Component {
                     })
                 } else if (resp.errList.length > 0) {
                     this.setState({
-                        modelTitle:"请检查表格，以下物料数量为非正整数、价格为负数",
+                        modelTitle:"请检查表格，以下物料数量或价格为非正整数、价格为负数",
                         modelContent: resp.errList.toString(),
                         modelVisible:true
                     })
                 } else if (resp.success) {
                     message.success(resp.msg)
                 } else {
-                    message.error(resp.msg)
+                    message.error(`数据库操作出错，${resp.msg}`)
                 }
             })
 
