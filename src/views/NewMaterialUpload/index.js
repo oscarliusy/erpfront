@@ -1,4 +1,4 @@
-import { Upload, Button, Icon, Card, message, Table, Select, Modal } from 'antd'
+import { Upload, Button, Icon, Card, message, Table, Select, Modal, notification } from 'antd'
 import React, { Component } from 'react'
 import { readFile } from '../../assets/lib/utils'
 import xlsx from 'xlsx'
@@ -24,7 +24,10 @@ export default class NewMaterialUpload extends Component {
             isUploadExcelSpin: false,
             isSubmitSpin: false,
             isInitSpin: false,
-            reqData: []
+            reqData: [],
+            modelVisible: false,
+            modelTitle:"",
+            modelContent:""
         }
     }
 
@@ -195,8 +198,19 @@ export default class NewMaterialUpload extends Component {
         }
         postMaterialNewUpload(reqData)
             .then(resp => {
-                if (resp.errList.length > 0) {
-                    message.error(`数量为非正整数、价格为负数：${resp.errList.toString()}`)
+                console.log(resp)
+                if (resp.repeatList.length > 0) {
+                    this.setState({
+                        modelTitle:"请检查表格，以下物料uniqueId已存在",
+                        modelContent: resp.repeatList.toString(),
+                        modelVisible:true
+                    })
+                } else if (resp.errList.length > 0) {
+                    this.setState({
+                        modelTitle:"请检查表格，以下物料数量为非正整数、价格为负数",
+                        modelContent: resp.errList.toString(),
+                        modelVisible:true
+                    })
                 } else if (resp.success) {
                     message.success(resp.msg)
                 } else {
@@ -204,6 +218,12 @@ export default class NewMaterialUpload extends Component {
                 }
             })
 
+    }
+
+    closeModal = () => {
+        this.setState({
+            modelVisible:false
+        })
     }
 
     componentDidMount() {
@@ -282,6 +302,14 @@ export default class NewMaterialUpload extends Component {
                     </Modal>
                 </Card>
                 <Table columns={this.state.columns} dataSource={this.state.dataSource} bordered />
+                <Modal
+                    title={this.state.modelTitle}
+                    visible={this.state.modelVisible}
+                    onOk={this.closeModal}
+                    onCancel={this.closeModal}
+                >
+                    <p>{this.state.modelContent}</p>
+                </Modal>
             </>
         )
     }
