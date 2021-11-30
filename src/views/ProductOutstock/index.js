@@ -3,7 +3,7 @@
  * 逻辑处理略有不同
  */
 import React, { Component } from 'react'
-import { 
+import {
     Card,
     Table,
     Button,
@@ -16,152 +16,152 @@ import {
     Upload
 } from 'antd'
 import xlsx from 'xlsx'
-import {readFile} from '../../assets/lib/utils'
+import { readFile } from '../../assets/lib/utils'
 import { OUTSTOCK_KEYS } from '../../assets/lib/model-constant'
-import { getPurchaserList,postOutstockUpload } from '../../requests'
+import { getPurchaserList, postOutstockUpload } from '../../requests'
 import './outstockupload.less'
 
 const { Option } = Select
 
 const formLayout = {
-    labelCol:{
-        span:4
+    labelCol: {
+        span: 4
     },
-    wrapperCol:{
-        span:16
+    wrapperCol: {
+        span: 16
     }
 }
 @Form.create()
 class ProductOutstock extends Component {
-    constructor(){
+    constructor() {
         super()
-        this.state={ 
-            outstockerList:[],
-            usersList:[],
+        this.state = {
+            outstockerList: [],
+            usersList: [],
 
             fileList: [],
-            dataSource:[],
-            columns:[],
-            sheetName:"",
-            excelOriginalData:[],
-            submitOutstockList:[],
+            dataSource: [],
+            columns: [],
+            sheetName: "",
+            excelOriginalData: [],
+            submitOutstockList: [],
 
-            isUploadExcelSpin:false,
-            isSubmitSpin:false,
-            isInitSpin:false
+            isUploadExcelSpin: false,
+            isSubmitSpin: false,
+            isInitSpin: false
         }
     }
 
-    initTableData = () =>{
+    initTableData = () => {
         this.setState({
-            dataSource:[],
-            columns:[],
-            sheetName:"",
-            excelOriginalData:[],
+            dataSource: [],
+            columns: [],
+            sheetName: "",
+            excelOriginalData: [],
             fileList: []
         })
     }
 
-    initData = () =>{
+    initData = () => {
         this.setState({
-            isInitSpin:true
+            isInitSpin: true
         })
         getPurchaserList()
-        .then(resp=>{
-            let _outstockerList = resp.map(item=>{
-                return item.name
+            .then(resp => {
+                let _outstockerList = resp.map(item => {
+                    return item.name
+                })
+                this.setState({
+                    outstockerList: _outstockerList,
+                    usersList: resp
+                })
             })
-            this.setState({
-                outstockerList:_outstockerList,
-                usersList:resp
+            .catch(err => {
+                console.log(err)
             })
-        })
-        .catch(err=>{
-            console.log(err)
-        })
-        .finally(()=>{
-            this.setState({
-                isInitSpin:false
+            .finally(() => {
+                this.setState({
+                    isInitSpin: false
+                })
             })
-        })
     }
 
-    handleUpload = async(file)=>{
-        if(!file || !file.name) return
+    handleUpload = async (file) => {
+        if (!file || !file.name) return
         this.setState({
-            isUploadExcelSpin:true
+            isUploadExcelSpin: true
         })
         //读取excel数据,变为json格式
         let data = await readFile(file)
-        let workbook = xlsx.read(data,{type:'binary'})
+        let workbook = xlsx.read(data, { type: 'binary' })
         let worksheet = workbook.Sheets[workbook.SheetNames[0]]//取出第一个表中的数据
         data = xlsx.utils.sheet_to_json(worksheet) //使用内置工具转化为json
         this.setState({
-            sheetName:workbook.SheetNames[0],
-            excelOriginalData:data
+            sheetName: workbook.SheetNames[0],
+            excelOriginalData: data
         })
-        this.buildTableData() 
+        this.buildTableData()
         this.buildSubmitOutstockList()
     }
 
-    buildTableData = () =>{
-        if(this.state.sheetName !== 'outstock'){
+    buildTableData = () => {
+        if (this.state.sheetName !== 'outstock') {
             message.warning('未使用出库模板,请检查')
             this.initTableData()
             this.setState({
-                isUploadExcelSpin:false
+                isUploadExcelSpin: false
             })
             return
         }
         let _columns = []
         let _dataSource = []
         const keys = Object.keys(this.state.excelOriginalData[0])
-        _columns = keys.map(item=>{
+        _columns = keys.map(item => {
             return {
-                title:item,
-                dataIndex:item,
-                key:item
+                title: item,
+                dataIndex: item,
+                key: item
             }
         })
         _columns.unshift({
-            title:"",
-            dataIndex:"key",
-            key:"key"
+            title: "",
+            dataIndex: "key",
+            key: "key"
         })
-        _dataSource = this.state.excelOriginalData.map((item,index)=>{
-            let _item = Object.assign({key:index+1},item)
+        _dataSource = this.state.excelOriginalData.map((item, index) => {
+            let _item = Object.assign({ key: index + 1 }, item)
             return _item
         })
         this.setState({
-            dataSource:_dataSource,
-            columns:_columns,
-            isUploadExcelSpin:false
+            dataSource: _dataSource,
+            columns: _columns,
+            isUploadExcelSpin: false
         })
     }
 
-    buildSubmitOutstockList = () =>{
-        let arr = [] 
-        this.state.excelOriginalData.forEach(item=>{
+    buildSubmitOutstockList = () => {
+        let arr = []
+        this.state.excelOriginalData.forEach(item => {
             let obj = {}
-            for(let key in OUTSTOCK_KEYS){
-                if(!OUTSTOCK_KEYS.hasOwnProperty(key)) break
+            for (let key in OUTSTOCK_KEYS) {
+                if (!OUTSTOCK_KEYS.hasOwnProperty(key)) break
                 let keyConfig = OUTSTOCK_KEYS[key],
                     text = keyConfig.text,
                     type = keyConfig.type
                 let value = item[text] || ""
-                value = this.typeTransform(value,type)
+                value = this.typeTransform(value, type)
                 obj[key] = value
             }
             arr.push(obj)
         })
         this.setState({
-            submitOutstockList:arr,
-            isUploadExcelSpin:false
+            submitOutstockList: arr,
+            isUploadExcelSpin: false
         })
     }
 
-    typeTransform = (value,type)=>{
-        switch(type){
+    typeTransform = (value, type) => {
+        switch (type) {
             case "string":
                 return String(value)
             case "number":
@@ -174,110 +174,110 @@ class ProductOutstock extends Component {
         }
     }
 
-    findUserId = (userName)=>{
+    findUserId = (userName) => {
         let id = 0
-        for(let item of this.state.usersList){
-            if(item.name === userName){
+        for (let item of this.state.usersList) {
+            if (item.name === userName) {
                 id = item.id
             }
         }
         return id
     }
 
-    excelDataValidator = () =>{
+    excelDataValidator = () => {
         let outstockError = ''
-        if(!this.state.submitOutstockList.length){
+        if (!this.state.submitOutstockList.length) {
             outstockError = '未添加入库EXCEL文件'
             return outstockError
         }
 
-        this.state.submitOutstockList.forEach(item=>{
-            if(item.amount === 0 || !Boolean(Number(item.amount))){
-                outstockError='出库项数量有误，请检查'  
+        this.state.submitOutstockList.forEach(item => {
+            if (item.amount <= 0 || !Boolean(Number(item.amount)) || item.amount % 1 !== 0) {
+                outstockError = '出库项数量有误，请检查'
             }
         })
 
-        let _skus = this.state.submitOutstockList.map(item=>{
+        let _skus = this.state.submitOutstockList.map(item => {
             return item.sku
         })
         let _skuSet = new Set(_skus)
-        if(_skuSet.size !== _skus.length){
-            outstockError='出库物料中存在重复项'
+        if (_skuSet.size !== _skus.length) {
+            outstockError = '出库物料中存在重复项'
         }
         return outstockError
     }
 
-    formDataValidator = (values) =>{
-        let outstockError=''
+    formDataValidator = (values) => {
+        let outstockError = ''
         let params = {}
         outstockError = this.excelDataValidator()
-        if(outstockError) return {params,outstockError}
+        if (outstockError) return { params, outstockError }
 
         let _userId = this.findUserId(values.outstocker)
-        params={
-            code:values.code,
-            description:values.description,
-            c_time:values.outstockAt.format("x"),
-            userOutstock_id:_userId,
-            products:this.state.submitOutstockList
+        params = {
+            code: values.code,
+            description: values.description,
+            c_time: values.outstockAt.format("x"),
+            userOutstock_id: _userId,
+            products: this.state.submitOutstockList
         }
-        return {params,outstockError}
+        return { params, outstockError }
     }
 
-    handleSubmit = e =>{
+    handleSubmit = e => {
         e.preventDefault()
-        this.props.form.validateFieldsAndScroll(async(err, values) => {
+        this.props.form.validateFieldsAndScroll(async (err, values) => {
             if (!err) {
-                const {params,outstockError} = this.formDataValidator(values)
-                if(outstockError){
+                const { params, outstockError } = this.formDataValidator(values)
+                if (outstockError) {
                     message.error(outstockError)
-                }else{
+                } else {
                     var warningMsg
-                    this.setState({isSubmitSpin:true})
+                    this.setState({ isSubmitSpin: true })
                     let upRes = await postOutstockUpload(params)
-                    if(upRes.status === 'succeed' && upRes.productNotFound.list.length === 0){
-                        if(upRes.negativeStock !== 0){
-                            warningMsg = "有"+upRes.negativeStock+"次物料扣减库操作存为负数，详情见最新日志"
+                    if (upRes.status === 'succeed' && upRes.productNotFound.list.length === 0) {
+                        if (upRes.negativeStock !== 0) {
+                            warningMsg = "有" + upRes.negativeStock + "次物料扣减库操作存为负数，详情见最新日志"
                             message.success(warningMsg)
                             // setTimeout(()=>{
                             //     this.props.history.push('/erp/comm/product/logs')
                             // },2000)
-                        }else{
+                        } else {
                             message.success('success')
-                            setTimeout(()=>{
+                            setTimeout(() => {
                                 this.props.history.push('/erp/comm/product/logs')
-                            },1500)
+                            }, 1500)
                         }
-                        this.setState({isSubmitSpin:false})
-                    }else if(upRes.status === 'failed'){
-                        if(upRes.productNotFound.list.length > 0){
-                            warningMsg ="产品出库失败，以下产品未找到："
-                            for(let i = 0; i < upRes.productNotFound.list.length; i++) {
-                               warningMsg +="\n" + JSON.stringify(upRes.productNotFound.list[i]);
+                        this.setState({ isSubmitSpin: false })
+                    } else if (upRes.status === 'failed') {
+                        if (upRes.productNotFound.list.length > 0) {
+                            warningMsg = "产品出库失败，以下产品未找到："
+                            for (let i = 0; i < upRes.productNotFound.list.length; i++) {
+                                warningMsg += "\n" + JSON.stringify(upRes.productNotFound.list[i]);
                             }
-                            message.warning(warningMsg,10)
-                        }else{
+                            message.warning(warningMsg, 10)
+                        } else {
                             message.warning(upRes.msg)
                         }
-                        this.setState({isSubmitSpin:false})
-                    }else{
-                        this.setState({isSubmitSpin:false})
+                        this.setState({ isSubmitSpin: false })
+                    } else {
+                        this.setState({ isSubmitSpin: false })
                     }
                 }
-                
-            }else{
-            message.error('请检查必填项和入库项是否填写正确')
-          }
+
+            } else {
+                message.error('请检查必填项和入库项是否填写正确')
+            }
         })
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.initData()
     }
 
     render() {
         const { getFieldDecorator } = this.props.form
-        const {fileList } = this.state
+        const { fileList } = this.state
         const props = {
             onRemove: file => {
                 this.setState(state => {
@@ -286,7 +286,7 @@ class ProductOutstock extends Component {
                     newFileList.splice(index, 1);
                     this.initTableData()
                     return {
-                    fileList: newFileList,
+                        fileList: newFileList,
                     }
                 })
             },
@@ -294,11 +294,11 @@ class ProductOutstock extends Component {
                 this.handleUpload(file)
                 this.setState(state => ({
                     fileList: [...state.fileList, file]
-                  }))
+                }))
                 return false
             },
             fileList,
-            accept:".xlsx,xls"
+            accept: ".xlsx,xls"
         }
         return (
             <div>
@@ -312,7 +312,7 @@ class ProductOutstock extends Component {
                     >
                         <Spin spinning={this.state.isSubmitSpin}>
                             <Form {...formLayout} className='form'>
-                                <div className ='form-item-wrap'>
+                                <div className='form-item-wrap'>
                                     <Form.Item
                                         label="出库编号"
                                         className="form-item"
@@ -320,13 +320,13 @@ class ProductOutstock extends Component {
                                         {getFieldDecorator('code', {
                                             rules: [
                                                 {
-                                                    required:true,
-                                                    message:'出库编号是必须填写的'
+                                                    required: true,
+                                                    message: '出库编号是必须填写的'
                                                 }
                                             ],
-                                            })(
-                                            <Input placeholder="OutstockCode"/>
-                                        )}                        
+                                        })(
+                                            <Input placeholder="OutstockCode" />
+                                        )}
                                     </Form.Item>
                                     <Form.Item
                                         label="出库信息"
@@ -335,29 +335,29 @@ class ProductOutstock extends Component {
                                         {getFieldDecorator('description', {
                                             rules: [
                                                 {
-                                                    required:true,
-                                                    message:'出库信息是必须填写的'
+                                                    required: true,
+                                                    message: '出库信息是必须填写的'
                                                 }
                                             ],
-                                            })(
-                                            <Input placeholder="InstockDescription"/>
-                                        )}                        
-                                    </Form.Item> 
+                                        })(
+                                            <Input placeholder="InstockDescription" />
+                                        )}
+                                    </Form.Item>
                                 </div>
-                                <div className ='form-item-wrap'>
+                                <div className='form-item-wrap'>
                                     <Form.Item
                                         label="出库时间"
                                         className="form-item"
                                     >
                                         {getFieldDecorator('outstockAt', {
-                                                rules: [
-                                                    {
-                                                        required:true,
-                                                        message:'出库时间是必须的'
-                                                    }
-                                                ],
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '出库时间是必须的'
+                                                }
+                                            ],
                                         })(
-                                            <DatePicker showTime placeholder="选择时间"  />
+                                            <DatePicker showTime placeholder="选择时间" />
                                         )}
                                     </Form.Item>
                                     <Form.Item
@@ -367,26 +367,26 @@ class ProductOutstock extends Component {
                                         {getFieldDecorator('outstocker', {
                                             rules: [
                                                 {
-                                                    required:true,
-                                                    message:'出库人是必须填写的'
+                                                    required: true,
+                                                    message: '出库人是必须填写的'
                                                 }
                                             ],
-                                            initialValue:this.state.outstockerList[0]
-                                            })(
-                                                <Select 
-                                                style={{ width: 200 }} 
+                                            initialValue: this.state.outstockerList[0]
+                                        })(
+                                            <Select
+                                                style={{ width: 200 }}
                                             >
                                                 {
-                                                    this.state.outstockerList.map(item=>{
-                                                        return(
+                                                    this.state.outstockerList.map(item => {
+                                                        return (
                                                             <Option value={item} key={item}>{item}</Option>
                                                         )
                                                     })
                                                 }
                                             </Select>
-                                        )} 
+                                        )}
                                     </Form.Item>
-                                </div>     
+                                </div>
                             </Form>
                             <div className="excel-btn">
                                 <Upload {...props}>
@@ -399,12 +399,12 @@ class ProductOutstock extends Component {
                         <Spin spinning={this.state.isUploadExcelSpin}>
                             <Table
                                 className="table"
-                                rowKey={record=>record.key}
+                                rowKey={record => record.key}
                                 dataSource={this.state.dataSource}
                                 columns={this.state.columns}
                                 pagination={{
-                                    total:this.state.dataSource.length,
-                                    showQuickJumper:true,
+                                    total: this.state.dataSource.length,
+                                    showQuickJumper: true,
                                 }}
                             />
                         </Spin>
@@ -414,4 +414,4 @@ class ProductOutstock extends Component {
         )
     }
 }
-export default ProductOutstock 
+export default ProductOutstock
