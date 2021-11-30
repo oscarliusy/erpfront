@@ -7,6 +7,8 @@ import { postUploadNewProduct, getPurchaserList } from '../../requests'
 
 const { Option } = Select;
 
+const productColumns = ["key","产品SKU", "title", 'description', "site", "品牌"]
+
 export default class NewMaterialUpload extends Component {
     constructor(props) {
         super(props)
@@ -25,7 +27,7 @@ export default class NewMaterialUpload extends Component {
             seletcUser: "",
             instockerList: [],
             usersList: [],
-
+            hasError: false
         }
     }
 
@@ -46,8 +48,10 @@ export default class NewMaterialUpload extends Component {
         })
         //构造呈现的data和向后端传递的data
         this.buildTableData(data)
-        this.buildSubmitInstockList(data)
-        this.buildListData()
+        if (this.confirmAllColumnExist()) {
+            this.buildSubmitInstockList(data)
+            this.buildListData()
+        }
     }
 
     buildTableData = () => {
@@ -84,6 +88,45 @@ export default class NewMaterialUpload extends Component {
             columns: _columns,
             isUploadExcelSpin: false
         })
+    }
+
+    confirmAllColumnExist = () => {
+        let status = true
+        let materialIndex = 1
+        for (let product of this.state.dataSource) {
+            materialIndex = 1
+            let keysCount = Object.keys(product).length
+            for (let item of productColumns) {
+                if (product[item] === undefined) {
+                    message.error(`${productColumns[item]}列不存在`)
+                    status = false
+                    break
+                }
+            }
+            while (status) {
+                let material = `物料${materialIndex}`
+                let materialCount = `物料${materialIndex}数量`
+                if (product[material] !== undefined && product[materialCount] !== undefined) {
+                    materialIndex++
+                } else if (product[material] === undefined && product[materialCount] === undefined) {
+                    break
+                } else {
+                    message.error(`物料数量、名称缺失无法上传`)
+                    status = false
+                }
+            }
+            console.log(productColumns.length)
+            console.log((materialIndex - 1) * 2)
+            console.log(Object.keys(product))
+            if ((productColumns.length + (materialIndex - 1) * 2) != keysCount && status) {
+                message.error(`格式有误`)
+                status = false
+            }
+            if (status === false) {
+                break
+            }
+        }
+        return status
     }
 
     buildSubmitInstockList = () => {
@@ -138,13 +181,12 @@ export default class NewMaterialUpload extends Component {
         this.state.dataSource.map(item => {
             let cur = this.buildData(item)
             let materialSet = new Set()
-            cur.materialList.map(material =>{
+            cur.materialList.map(material => {
                 materialSet.add(material.uniqueId)
             })
             if (materialSet.size !== cur.materialList.length) {
                 duplicateMaterialList.push(cur.sku)
             }
-            console.log(duplicateMaterialList)
             if (productMap.get(cur.sku) === undefined) {
                 let sku = cur.sku
                 cur.sku = sku.trim()
