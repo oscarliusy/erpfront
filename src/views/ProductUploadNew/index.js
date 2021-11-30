@@ -277,7 +277,7 @@ export default class NewMaterialUpload extends Component {
             postUploadNewProduct(this.state.reqData).then(response => {
                 console.log(response)
                 if (!response.productExistInfo.allNewProductNotExist) {
-                    message.error(`以下产品(SKU)已存在(sku重复或大小写已存在):${response.productExistInfo.upOrLowCase.toString()}`)
+                    message.error(`以下产品(SKU)已存在:${response.productExistInfo.reapeatSku.toString()}`)
                 } else if (!response.materialExistInfo.allMaterialExist) {
                     message.error(`以下物料不存在:${response.materialExistInfo.materialNotFindList.toString()}`)
                 } else if (!response.brandExistInfo.allBrandExist) {
