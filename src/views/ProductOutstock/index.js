@@ -248,7 +248,7 @@ class ProductOutstock extends Component {
                     let upRes = await postOutstockUpload(params)
                     if (upRes.status === 'succeed' && upRes.productNotFound.list.length === 0) {
                         if (upRes.negativeStock !== 0) {
-                            warningMsg = "有" + upRes.negativeStock + "次物料扣减库操作存为负数，详情见最新日志"
+                            warningMsg = "有" + upRes.negativeStock + "次物料扣减库操作存为负数"
                             message.success(warningMsg)
                             // setTimeout(()=>{
                             //     this.props.history.push('/erp/comm/product/logs')
