@@ -20,7 +20,8 @@ import {
     Select,
     DatePicker,
     message,
-    Upload
+    Upload,
+    Modal
 } from 'antd'
 import xlsx from 'xlsx'
 import './instockupload.less'
@@ -56,7 +57,10 @@ class InstockUpload extends Component {
 
             isUploadExcelSpin:false,
             isSubmitSpin:false,
-            isInitSpin:false
+            isInitSpin:false,
+            modelTitle:"",
+            modelVisible:"",
+            modelContent:""
         }
     }
     /**
@@ -80,7 +84,7 @@ class InstockUpload extends Component {
             excelOriginalData:data
         })
         //构造呈现的data和向后端传递的data
-        this.buildTableData(data) 
+        this.buildTableData(data)
         this.buildSubmitInstockList(data)
     }
 
@@ -221,7 +225,11 @@ class InstockUpload extends Component {
                         if(resp.msg.success){
                             message.success(resp.msg.data)
                         }else{
-                            message.error(resp.msg.data)
+                            this.setState({
+                                modelContent:resp.msg.data,
+                                modelTitle:"入库失败，详情见下",
+                                modelVisible:true
+                            })
                         }
                         //this.props.history.push('/erp/comm/material/list')
                     })
@@ -288,6 +296,12 @@ class InstockUpload extends Component {
             }
         }
         return id
+    }
+
+    closeModal = () => {
+        this.setState({
+            modelVisible:false
+        })
     }
 
     render() {
@@ -425,6 +439,14 @@ class InstockUpload extends Component {
                     </Spin>
                 </Card>
                 </Spin>
+                <Modal
+                    title={this.state.modelTitle}
+                    visible={this.state.modelVisible}
+                    onOk={this.closeModal}
+                    onCancel={this.closeModal}
+                >
+                    <p>{this.state.modelContent}</p>
+                </Modal>
             </div>
         )
     }
