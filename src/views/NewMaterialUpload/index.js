@@ -7,6 +7,8 @@ import { getPurchaserList } from '../../requests'
 import { postMaterialNewUpload } from '../../requests'
 
 const { Option } = Select;
+const materialColumns = ["唯一识别码", "备注", '入库数量']
+
 export default class NewMaterialUpload extends Component {
     constructor(props) {
         super(props)
@@ -26,8 +28,8 @@ export default class NewMaterialUpload extends Component {
             isInitSpin: false,
             reqData: [],
             modelVisible: false,
-            modelTitle:"",
-            modelContent:""
+            modelTitle: "",
+            modelContent: ""
         }
     }
 
@@ -47,8 +49,30 @@ export default class NewMaterialUpload extends Component {
             excelOriginalData: data
         })
         //构造呈现的data和向后端传递的data
-        this.buildTableData(data)
-        this.buildSubmitInstockList(data)
+        if (this.confirmAllColumnExist(data)) {
+            this.buildTableData(data)
+            this.buildSubmitInstockList(data)
+        }
+    }
+
+    confirmAllColumnExist = (data) => {
+        let status = true
+        console.log(data)
+        for (let i = 0; i < data.length; i++) {
+            let material = data[i]
+            for (let j = 0; j < materialColumns.length; j++) {
+                let item = materialColumns[j]
+                if (material[item] === undefined || (j !== 2 && material[item].trim() === "")) {
+                    message.error(`第${i + 2}行${materialColumns[j]}列不存在`)
+                    status = false
+                    break
+                }
+            }
+            if (!status) {
+                break
+            }
+        }
+        return status
     }
 
     buildTableData = () => {
@@ -201,15 +225,15 @@ export default class NewMaterialUpload extends Component {
                 console.log(resp)
                 if (resp.repeatList.length > 0) {
                     this.setState({
-                        modelTitle:"请检查表格，以下物料uniqueId已存在",
+                        modelTitle: "请检查表格，以下物料uniqueId已存在",
                         modelContent: resp.repeatList.toString(),
-                        modelVisible:true
+                        modelVisible: true
                     })
                 } else if (resp.errList.length > 0) {
                     this.setState({
-                        modelTitle:"请检查表格，以下物料数量或价格为非正整数、价格为负数",
+                        modelTitle: "请检查表格，以下物料数量或价格为非正整数、价格为负数",
                         modelContent: resp.errList.toString(),
-                        modelVisible:true
+                        modelVisible: true
                     })
                 } else if (resp.success) {
                     message.success(resp.msg)
@@ -222,7 +246,7 @@ export default class NewMaterialUpload extends Component {
 
     closeModal = () => {
         this.setState({
-            modelVisible:false
+            modelVisible: false
         })
     }
 
