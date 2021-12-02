@@ -7,7 +7,7 @@ import { postUploadNewProduct, getPurchaserList } from '../../requests'
 
 const { Option } = Select;
 
-const productColumns = ["key","产品SKU", "title", 'description', "site", "品牌"]
+const productColumns = ["产品SKU", "title", 'description', "site", "品牌"]
 
 export default class NewMaterialUpload extends Component {
     constructor(props) {
@@ -99,12 +99,14 @@ export default class NewMaterialUpload extends Component {
         for (let product of this.state.dataSource) {
             materialIndex = 1
             let keysCount = Object.keys(product).length
+            let i = 0
             for (let item of productColumns) {
                 if (product[item] === undefined) {
-                    message.error(`${productColumns[item]}列不存在`)
+                    message.error(`${productColumns[i]}列不存在`)
                     status = false
                     break
                 }
+                i++
             }
             while (status) {
                 let material = `物料${materialIndex}`
@@ -280,37 +282,35 @@ export default class NewMaterialUpload extends Component {
                 if (!response.productExistInfo.allNewProductNotExist) {
                     modelTitle = "以下产品(SKU)已存在"
                     content = response.productExistInfo.reapeatSku.toString()
-                    //message.error(`以下产品(SKU)已存在:${response.productExistInfo.reapeatSku.toString()}`)
                 } else if (!response.materialExistInfo.allMaterialExist) {
                     modelTitle = "以下物料不存在"
                     content = response.materialExistInfo.materialNotFindList.toString()
-                    //message.error(`以下物料不存在:${response.materialExistInfo.materialNotFindList.toString()}`)
                 } else if (!response.brandExistInfo.allBrandExist) {
                     modelTitle = "以下品牌不存在"
                     content = response.brandExistInfo.brandNotFound.toString()
 
-                    //message.error(`以下品牌不存在:${response.brandExistInfo.brandNotFound.toString()}`)
                 } else if (!response.siteExistInfo.allSitesExist) {
                     modelTitle = "以下站点不存在"
                     content = response.siteExistInfo.siteNotFound.toString()
 
-                    //essage.error(`以下站点不存在:${response.siteExistInfo.siteNotFound.toString()}`)
                 } else if (!response.amountInfo.amountAllInt) {
                     modelTitle = "以下sku中的物料数量不是正整数"
                     content = response.amountInfo.illegalSku.toString()
 
-                    //message.error(`以下sku中的物料数量不是正整数:${response.amountInfo.illegalSku.toString()}`)
                 } else if (response.emptyInfo.hasEmpty) {
                     message.error(`检查Excel表，SKU、title、title存在空(undefined)`)
                 } else if (response.insertResult.success) {
                     message.success(response.insertResult.message)
                 }
-                this.setState({
-                    modelTitle:modelTitle,
-                    modelContent:content,
-                    modelVisible:true,
-                    visible: false
-                })
+
+                if(!response.insertResult.success){
+                    this.setState({
+                        modelTitle:modelTitle,
+                        modelContent:content,
+                        modelVisible:true,
+                        visible: false
+                    })
+                }
             })
         }
     }
