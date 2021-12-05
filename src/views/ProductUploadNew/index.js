@@ -96,13 +96,14 @@ export default class NewMaterialUpload extends Component {
     confirmAllColumnExist = () => {
         let status = true
         let materialIndex = 1
+        let rowIndex = 2
         for (let product of this.state.dataSource) {
             materialIndex = 1
             let keysCount = Object.keys(product).length
             let i = 0
             for (let item of productColumns) {
                 if (product[item] === undefined) {
-                    message.error(`${productColumns[i]}列不存在`)
+                    message.error(`第${rowIndex}行${productColumns[i]}不存在`)
                     status = false
                     break
                 }
@@ -120,7 +121,9 @@ export default class NewMaterialUpload extends Component {
                     status = false
                 }
             }
-            if ((productColumns.length + (materialIndex - 1) * 2) != keysCount && status) {
+
+            //product对象中会比Excel表多一个属性，所以要对keysCount - 1
+            if ((productColumns.length + (materialIndex - 1) * 2) != (keysCount-1) && status) {
                 message.error(`格式有误`)
                 status = false
             }
