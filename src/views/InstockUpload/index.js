@@ -30,6 +30,7 @@ import { INSTOCK_KEYS } from '../../assets/lib/model-constant'
 import { getPurchaserList,instockMaterialPost } from '../../requests'
 
 const { Option } = Select
+const materialColumns = ["唯一识别码", "备注", '入库数量']
 
 const formLayout = {
 labelCol:{
@@ -84,8 +85,30 @@ class InstockUpload extends Component {
             excelOriginalData:data
         })
         //构造呈现的data和向后端传递的data
-        this.buildTableData(data)
-        this.buildSubmitInstockList(data)
+        if(this.confirmAllColumnExist(data)){
+            this.buildTableData(data)
+            this.buildSubmitInstockList(data)
+        }
+    }
+
+    confirmAllColumnExist = (data) => {
+        let status = true
+        console.log(data)
+        for (let i = 0; i < data.length; i++) {
+            let material = data[i]
+            for (let j = 0; j < materialColumns.length; j++) {
+                let item = materialColumns[j]
+                if (material[item] === undefined || (isNaN(material[item]) && material[item].trim() === "")) {
+                    message.error(`第${i + 2}行${materialColumns[j]}列不存在`)
+                    status = false
+                    break
+                }
+            }
+            if (!status) {
+                break
+            }
+        }
+        return status
     }
 
     buildTableData = () =>{
