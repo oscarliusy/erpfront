@@ -145,11 +145,13 @@ class ProductOutstock extends Component {
     buildSubmitOutstockList = () => {
         let arr = []
         let status = true
+        let rowIndex = 2
         this.state.excelOriginalData.forEach(item => {
             let obj = {}
             for (let key in OUTSTOCK_KEYS) {
                 let rowName = OUTSTOCK_KEYS[key].text
                 if(item[rowName] ===undefined) {
+                    message.error(`Excel表的第${rowIndex}行列${rowName}缺失`)
                     status = false
                 }
                 if (!OUTSTOCK_KEYS.hasOwnProperty(key)) {
@@ -169,8 +171,6 @@ class ProductOutstock extends Component {
                 submitOutstockList: arr,
                 isUploadExcelSpin: false
             })
-        }else{
-            message.error("列缺失，请检查")
         }
     }
     
