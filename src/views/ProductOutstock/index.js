@@ -270,7 +270,11 @@ class ProductOutstock extends Component {
                                 warningMsg += "\n" + JSON.stringify(upRes.productNotFound.list[i]);
                             }
                             message.warning(warningMsg, 10)
-                        } else {
+                        }else if(upRes.sitNotfound.list.length > 0) {
+                            warningMsg = `产品出库失败，以下站点未找到：${upRes.sitNotfound.list.toString()}`
+                            message.warning(warningMsg, 10)
+                        }
+                        else {
                             message.warning(upRes.msg)
                         }
                         this.setState({ isSubmitSpin: false })
