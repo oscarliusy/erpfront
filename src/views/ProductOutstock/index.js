@@ -148,10 +148,13 @@ class ProductOutstock extends Component {
         this.state.excelOriginalData.forEach(item => {
             let obj = {}
             for (let key in OUTSTOCK_KEYS) {
-                if(item.key===undefined){
+                let rowName = OUTSTOCK_KEYS[key].text
+                if(item[rowName] ===undefined) {
                     status = false
                 }
-                if (!OUTSTOCK_KEYS.hasOwnProperty(key)) break
+                if (!OUTSTOCK_KEYS.hasOwnProperty(key)) {
+                    break
+                }
                 let keyConfig = OUTSTOCK_KEYS[key],
                     text = keyConfig.text,
                     type = keyConfig.type
