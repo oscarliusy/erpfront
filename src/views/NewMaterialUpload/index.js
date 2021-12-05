@@ -7,7 +7,7 @@ import { getPurchaserList } from '../../requests'
 import { postMaterialNewUpload } from '../../requests'
 
 const { Option } = Select;
-const materialColumns = ["唯一识别码", "备注", '入库数量']
+const materialColumns = ["唯一识别码", "备注", '入库数量',"采购价"]
 
 export default class NewMaterialUpload extends Component {
     constructor(props) {
@@ -62,7 +62,7 @@ export default class NewMaterialUpload extends Component {
             let material = data[i]
             for (let j = 0; j < materialColumns.length; j++) {
                 let item = materialColumns[j]
-                if (material[item] === undefined || (j !== 2 && material[item].trim() === "")) {
+                if (material[item] === undefined || (isNaN(material[item]) && material[item].trim() === "")) {
                     message.error(`第${i + 2}行${materialColumns[j]}列不存在`)
                     status = false
                     break
