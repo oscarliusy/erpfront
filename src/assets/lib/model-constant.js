@@ -36,3 +36,18 @@ export const OUTSTOCK_KEYS = {
     type:'number'
   }
 }
+
+export const OUTSTOCK_KEYS_BRAND = {
+  brand:{
+    text:'品牌',
+    type:'string'
+  },
+  sku:{
+    text:'sku',
+    type:'string'
+  },
+  amount:{
+    text:'出库数量',
+    type:'number'
+  }
+}

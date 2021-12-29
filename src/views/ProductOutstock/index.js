@@ -17,12 +17,12 @@ import {
 } from 'antd'
 import xlsx from 'xlsx'
 import { readFile } from '../../assets/lib/utils'
-import { OUTSTOCK_KEYS } from '../../assets/lib/model-constant'
+import { OUTSTOCK_KEYS_BRAND } from '../../assets/lib/model-constant'
 import { getPurchaserList, postOutstockUpload } from '../../requests'
 import './outstockupload.less'
 
 const { Option } = Select
-const columns = ["站点","sku","出库数量"]
+const columns = ["品牌(brand)","sku","出库数量"]
 
 
 const formLayout = {
@@ -54,6 +54,9 @@ class ProductOutstock extends Component {
         }
     }
 
+    /**
+     * 初始化excel转换显示的表格数据
+     */
     initTableData = () => {
         this.setState({
             dataSource: [],
@@ -64,6 +67,10 @@ class ProductOutstock extends Component {
         })
     }
 
+    /**
+     * 加载入库人列表
+     * 开始转圈圈，执行结束后停止
+     */
     initData = () => {
         this.setState({
             isInitSpin: true
@@ -88,6 +95,15 @@ class ProductOutstock extends Component {
             })
     }
 
+
+    /**
+     * 批量出库(点击btn触发)
+     *  1.处理excel
+     *  2.生成表格并显示
+     *  3.上传数据
+     * @param {*} file 上传的批量出库excel文件 
+     * @returns 
+     */
     handleUpload = async (file) => {
         if (!file || !file.name) return
         this.setState({
@@ -148,16 +164,16 @@ class ProductOutstock extends Component {
         let rowIndex = 2
         this.state.excelOriginalData.forEach(item => {
             let obj = {}
-            for (let key in OUTSTOCK_KEYS) {
-                let rowName = OUTSTOCK_KEYS[key].text
+            for (let key in OUTSTOCK_KEYS_BRAND) {
+                let rowName = OUTSTOCK_KEYS_BRAND[key].text
                 if(item[rowName] ===undefined) {
                     message.error(`Excel表的第${rowIndex}行列${rowName}缺失`)
                     status = false
                 }
-                if (!OUTSTOCK_KEYS.hasOwnProperty(key)) {
+                if (!OUTSTOCK_KEYS_BRAND.hasOwnProperty(key)) {
                     break
                 }
-                let keyConfig = OUTSTOCK_KEYS[key],
+                let keyConfig = OUTSTOCK_KEYS_BRAND[key],
                     text = keyConfig.text,
                     type = keyConfig.type
                 let value = item[text] || ""
