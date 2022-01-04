@@ -25,6 +25,7 @@ const titleDisplayMap = {
     amount:'出库数量',
     sku:'SKU',
     site:'站点',
+    brand:'品牌',
 
     createAt:'时间',
     action:'操作内容'
