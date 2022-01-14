@@ -286,8 +286,12 @@ class ProductOutstock extends Component {
                                 warningMsg += "\n" + JSON.stringify(upRes.productNotFound.list[i]);
                             }
                             message.warning(warningMsg, 10)
-                        }else if(upRes.sitNotfound.list.length > 0) {
-                            warningMsg = `产品出库失败，以下站点未找到：${upRes.sitNotfound.list.toString()}`
+                        // }else if(upRes.sitNotfound.list.length > 0) {
+                        //     warningMsg = `产品出库失败，以下站点未找到：${upRes.sitNotfound.list.toString()}`
+                        //     message.warning(warningMsg, 10)
+                        // }
+                        }else if(upRes.brandNotFound.list.length > 0){
+                            warningMsg = `产品出库失败，以下品牌未找到：${upRes.brandNotFound.list.toString()}`
                             message.warning(warningMsg, 10)
                         }
                         else {
