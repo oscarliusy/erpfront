@@ -114,6 +114,9 @@ class Dashboard extends Component {
                     >
                         <div ref={this.saleListChartRef} style={{height:'400px'}}/>
                     </Card>
+                    <div style={{textAlign: 'center',color:'black'}}>
+                        <a href="https://beian.miit.gov.cn">京ICP备20026508号-1</a>
+                    </div>
                 </Spin>
             </>
         )

@@ -230,6 +230,9 @@ export default class IMList extends Component {
                         }}
                     />
                 </Card>
+                <div style={{textAlign: 'center',color:'black'}}>
+                    <a href="https://beian.miit.gov.cn">京ICP备20026508号-1</a>
+                </div>
             </Spin>
         )
     }
